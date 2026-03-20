@@ -1,0 +1,181 @@
+from flask import Flask, request, render_template, send_file
+from tensorflow.keras.models import load_model
+import numpy as np
+import io
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+
+app = Flask(__name__)
+
+# Load model
+model = load_model('mymodel.keras')
+
+
+# Risk calculation
+def compute_risk_and_result(prediction_array):
+    prob = float(prediction_array[0][0])
+    prob = max(0.0, min(1.0, prob))
+
+    risk_score = round(prob * 100, 1)
+
+    if prob >= 0.75:
+        category = "High Risk"
+    elif prob >= 0.4:
+        category = "Medium Risk"
+    else:
+        category = "Low Risk"
+
+    return risk_score, category, prob
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        # ✅ 12 FEATURES ONLY (FIXED)
+        inputs = [
+            float(request.form['age']),
+            float(request.form['gender']),
+            float(request.form['chestpain']),
+            float(request.form['restingBP']),
+            float(request.form['serumcholestrol']),
+            # ❌ REMOVED fastingbloodsugar
+            float(request.form['restingrelectro']),
+            float(request.form['maxheartrate']),
+            float(request.form['exerciseangia']),
+            float(request.form['oldpeak']),
+            float(request.form['slope']),
+            float(request.form['noofmajorvessels']),
+            float(request.form['thal'])
+        ]
+
+        print("INPUT:", inputs)
+        print("INPUT LENGTH:", len(inputs))
+
+        input_array = np.array([inputs])
+
+        prediction = model.predict(input_array)
+        print("PREDICTION:", prediction)
+
+        risk_score, category, prob = compute_risk_and_result(prediction)
+
+        return render_template(
+            'result.html',
+            risk_score=risk_score,
+            category=category,
+            probability=round(prob, 3)
+        )
+
+    except Exception as e:
+        print("ERROR:", e)
+        return f"<h2>Error: {str(e)}</h2>"
+
+
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.pagesizes import letter
+import datetime
+
+@app.route('/report', methods=['POST'])
+def report():
+    try:
+        risk_score = request.form['risk_score']
+        category = request.form['category']
+        probability = request.form['probability']
+
+        buffer = io.BytesIO()
+
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+        styles = getSampleStyleSheet()
+
+        # 🎨 Custom Styles
+        title_style = ParagraphStyle(
+            name='TitleStyle',
+            fontSize=20,
+            textColor=colors.red,
+            spaceAfter=20,
+            alignment=1  # center
+        )
+
+        heading_style = ParagraphStyle(
+            name='Heading',
+            fontSize=14,
+            textColor=colors.black,
+            spaceAfter=10
+        )
+
+        normal_style = styles["Normal"]
+
+        content = []
+
+        # 🏥 HEADER
+        content.append(Paragraph("❤️ Heart Disease Risk Report", title_style))
+        content.append(Paragraph("AI Health Diagnostics System", normal_style))
+        content.append(Spacer(1, 15))
+
+        # 📅 Date
+        date = datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
+        content.append(Paragraph(f"<b>Date:</b> {date}", normal_style))
+        content.append(Spacer(1, 15))
+
+        # 📊 TABLE DATA
+        data = [
+            ["Parameter", "Value"],
+            ["Risk Level", category],
+            ["Risk Score", f"{risk_score}%"],
+            ["Probability", probability]
+        ]
+
+        table = Table(data, colWidths=[200, 200])
+
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.red),
+            ('TEXTCOLOR',(0,0),(-1,0),colors.white),
+            ('ALIGN',(0,0),(-1,-1),'CENTER'),
+            ('FONTNAME', (0,0),(-1,0),'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0,0),(-1,0),12),
+            ('GRID', (0,0),(-1,-1),1,colors.black),
+        ]))
+
+        content.append(table)
+        content.append(Spacer(1, 25))
+
+        # 🧠 INTERPRETATION
+        if category == "High Risk":
+            advice = "⚠️ High probability of heart disease. Immediate medical consultation is strongly recommended."
+        elif category == "Medium Risk":
+            advice = "⚠️ Moderate risk detected. Lifestyle changes and periodic checkups advised."
+        else:
+            advice = "✅ Low risk. Maintain a healthy lifestyle and regular exercise."
+
+        content.append(Paragraph("<b>Medical Interpretation:</b>", heading_style))
+        content.append(Paragraph(advice, normal_style))
+
+        content.append(Spacer(1, 25))
+
+        # 🧾 FOOTER
+        content.append(Paragraph("---- End of Report ----", normal_style))
+        content.append(Paragraph("Generated by AI Health System", normal_style))
+
+        doc.build(content)
+
+        buffer.seek(0)
+
+        return send_file(
+            buffer,
+            as_attachment=True,
+            download_name="Heart_Report_Professional.pdf",
+            mimetype='application/pdf'
+        )
+
+    except Exception as e:
+        return str(e)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

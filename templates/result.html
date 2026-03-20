@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1d2b64, #f8cdda);
+    text-align: center;
+}
+
+.card {
+    width: 400px;
+    margin: 100px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+h1 {
+    color: red;
+}
+
+.low { color: green; }
+.medium { color: orange; }
+.high { color: red; }
+
+button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    border-radius: 10px;
+    border: none;
+    background: #ff416c;
+    color: white;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>❤️ Prediction Result</h2>
+
+<h1 class="{{ category|lower|replace(' ', '') }}">{{ category }}</h1>
+
+<p><b>Risk Score:</b> {{ risk_score }}%</p>
+<p><b>Probability:</b> {{ probability }}</p>
+
+<form action="/report" method="POST">
+<input type="hidden" name="risk_score" value="{{ risk_score }}">
+<input type="hidden" name="category" value="{{ category }}">
+<input type="hidden" name="probability" value="{{ probability }}">
+<button>📄 Download Report</button>
+</form>
+
+<br><br>
+<a href="/">⬅ Back</a>
+
+</div>
+
+</body>
+</html>
