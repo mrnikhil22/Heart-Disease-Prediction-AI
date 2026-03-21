@@ -1,6 +1,6 @@
 tensorflow-cpu==2.10.0
 keras==2.10.0
-numpy>=1.21
+numpy<2  # pin to compatible 1.x version
 flask>=2.0
 scikit-learn>=1.0
 matplotlib
