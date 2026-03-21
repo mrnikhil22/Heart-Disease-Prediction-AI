@@ -4,5 +4,6 @@ keras==2.10.0
 flask==2.2.5
 scikit-learn==1.2.2
 matplotlib==3.7.2
-reportlab
+pandas==1.5.3
+reportlab==4.4.10
 gunicorn==20.1.0
