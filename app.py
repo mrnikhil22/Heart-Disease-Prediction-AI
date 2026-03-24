@@ -8,11 +8,15 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.pagesizes import letter
 import datetime
 import os
+import joblib   # ✅ ADDED
 
 app = Flask(__name__)
 
 # Load model
 model = load_model('mymodel.keras')
+
+# ✅ LOAD SCALER (IMPORTANT)
+scaler = joblib.load("scaler.pkl")
 
 
 # Risk calculation
@@ -46,6 +50,7 @@ def predict():
             float(request.form['chestpain']),
             float(request.form['restingBP']),
             float(request.form['serumcholestrol']),
+            float(request.form['fastingbloodsugar']),
             float(request.form['restingrelectro']),
             float(request.form['maxheartrate']),
             float(request.form['exerciseangia']),
@@ -56,6 +61,14 @@ def predict():
         ]
 
         input_array = np.array([inputs])
+
+            # ✅ FIX: Ensure correct column order (VERY IMPORTANT)
+        input_array = input_array.reshape(1, -1)
+
+           # ✅ APPLY SCALING
+        input_array = scaler.transform(input_array)
+
+        
 
         prediction = model.predict(input_array)
 
