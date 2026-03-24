@@ -2,8 +2,12 @@ from flask import Flask, request, render_template, send_file
 from tensorflow.keras.models import load_model
 import numpy as np
 import io
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.pagesizes import letter
+import datetime
+import os
 
 app = Flask(__name__)
 
@@ -66,15 +70,8 @@ def predict():
 
     except Exception as e:
         print("ERROR:", e)
-        return f"<h2>Error: {str(e)}</h2>"
+        return "<h2>Invalid Input! Please enter correct values.</h2>"
 
-
-# ----------- PDF CODE SAME (UNCHANGED) -----------
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.pagesizes import letter
-import datetime
 
 @app.route('/report', methods=['POST'])
 def report():
@@ -84,7 +81,6 @@ def report():
         probability = request.form['probability']
 
         buffer = io.BytesIO()
-
         doc = SimpleDocTemplate(buffer, pagesize=letter)
         styles = getSampleStyleSheet()
 
@@ -96,18 +92,11 @@ def report():
             alignment=1
         )
 
-        heading_style = ParagraphStyle(
-            name='Heading',
-            fontSize=14,
-            spaceAfter=10
-        )
-
         normal_style = styles["Normal"]
 
         content = []
 
         content.append(Paragraph("❤️ Heart Disease Risk Report", title_style))
-        content.append(Paragraph("AI Health Diagnostics System", normal_style))
         content.append(Spacer(1, 15))
 
         date = datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
@@ -131,20 +120,6 @@ def report():
         ]))
 
         content.append(table)
-        content.append(Spacer(1, 25))
-
-        if category == "High Risk":
-            advice = "⚠️ High probability of heart disease. Immediate medical consultation is strongly recommended."
-        elif category == "Medium Risk":
-            advice = "⚠️ Moderate risk detected. Lifestyle changes and periodic checkups advised."
-        else:
-            advice = "✅ Low risk. Maintain a healthy lifestyle."
-
-        content.append(Paragraph("<b>Medical Interpretation:</b>", heading_style))
-        content.append(Paragraph(advice, normal_style))
-
-        content.append(Spacer(1, 25))
-        content.append(Paragraph("---- End of Report ----", normal_style))
 
         doc.build(content)
 
@@ -153,7 +128,7 @@ def report():
         return send_file(
             buffer,
             as_attachment=True,
-            download_name="Heart_Report_Professional.pdf",
+            download_name="Heart_Report.pdf",
             mimetype='application/pdf'
         )
 
@@ -161,8 +136,7 @@ def report():
         return str(e)
 
 
-# ✅ FINAL FIX (MOST IMPORTANT FOR RENDER)
-import os
+# ✅ IMPORTANT FOR RENDER
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 10000))   # ⚠️ 5000 mat use karna
     app.run(host='0.0.0.0', port=port)
