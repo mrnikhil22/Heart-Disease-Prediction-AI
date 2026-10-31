@@ -1,199 +1,1475 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Heart Risk Analyzer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>Heart AI | Clinical Assessment</title>
 
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-body {
-    background: linear-gradient(135deg, #ff416c, #ff4b2b);
-    height: 100vh;
-}
+        :root {
+            --bg: #080b10;
+            --card: #10151d;
+            --card2: #0d1219;
+            --red: #ef4444;
+            --red-dark: #dc2626;
+            --red-light: #f87171;
+            --border: rgba(255,255,255,0.08);
+            --text: #f5f7fa;
+            --muted: #8d98a6;
+        }
 
-.container {
-    width: 900px;
-    margin: 30px auto;
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-}
+        body {
+            font-family: Inter, Arial, sans-serif;
+            background:
+                radial-gradient(
+                    circle at 85% 10%,
+                    rgba(239, 68, 68, 0.10),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 10% 70%,
+                    rgba(220, 38, 38, 0.06),
+                    transparent 25%
+                ),
+                var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
 
-h1 {
-    text-align: center;
-    color: #ff416c;
-    margin-bottom: 20px;
-}
+        /* =========================
+           NAVBAR
+        ========================= */
 
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
+        .navbar {
+            height: 76px;
+            width: 100%;
+            padding: 0 6%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
 
-label {
-    font-weight: 500;
-}
+            background: rgba(8, 11, 16, 0.90);
+            border-bottom: 1px solid var(--border);
 
-input, select {
-    width: 100%;
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    margin-top: 5px;
-}
+            backdrop-filter: blur(16px);
 
-.full {
-    grid-column: span 2;
-}
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-button {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 15px;
-    background: linear-gradient(135deg, #ff416c, #ff4b2b);
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-    transition: 0.3s;
-}
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
 
-button:hover {
-    transform: scale(1.05);
-}
+            text-decoration: none;
+            color: white;
+        }
 
-.header {
-    text-align: center;
-    margin-bottom: 20px;
-}
+        .brand-icon {
+            width: 42px;
+            height: 42px;
 
-.header span {
-    font-size: 40px;
-}
-</style>
+            border-radius: 12px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: linear-gradient(
+                135deg,
+                #ef4444,
+                #991b1b
+            );
+
+            color: white;
+            font-size: 21px;
+
+            box-shadow:
+                0 8px 25px rgba(239,68,68,0.20);
+        }
+
+        .brand-text {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-text span {
+            color: var(--red-light);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #9ba7b5;
+
+            padding: 10px 16px;
+
+            border-radius: 10px;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            transition: 0.25s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: white;
+            background: rgba(239,68,68,0.10);
+        }
+
+        .dashboard-btn {
+            border: 1px solid rgba(239,68,68,0.22);
+            background: rgba(239,68,68,0.06);
+        }
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .hero {
+            max-width: 1180px;
+            margin: auto;
+
+            padding: 70px 24px 38px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 8px 14px;
+
+            border-radius: 999px;
+
+            background: rgba(239,68,68,0.07);
+            border: 1px solid rgba(239,68,68,0.20);
+
+            color: #f87171;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            letter-spacing: 0.5px;
+        }
+
+        .hero-badge::before {
+            content: "";
+
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: #ef4444;
+
+            box-shadow:
+                0 0 10px rgba(239,68,68,0.8);
+        }
+
+        .hero h1 {
+            margin-top: 18px;
+
+            max-width: 800px;
+
+            font-size: clamp(38px, 5vw, 58px);
+
+            line-height: 1.08;
+
+            letter-spacing: -2px;
+        }
+
+        .hero h1 span {
+            color: var(--red);
+        }
+
+        .hero p {
+            margin-top: 18px;
+
+            max-width: 720px;
+
+            color: var(--muted);
+
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main-container {
+            max-width: 1180px;
+            margin: auto;
+
+            padding: 30px 24px 80px;
+        }
+
+        .section-heading {
+            margin-bottom: 28px;
+        }
+
+        .section-heading h2 {
+            font-size: 31px;
+            letter-spacing: -1px;
+
+            margin-bottom: 8px;
+        }
+
+        .section-heading p {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* =========================
+           MAIN CARD
+        ========================= */
+
+        .assessment-card {
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(18,23,31,0.98),
+                    rgba(11,15,21,0.98)
+                );
+
+            border: 1px solid var(--border);
+
+            border-radius: 22px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 30px 80px rgba(0,0,0,0.32),
+                inset 0 1px 0 rgba(255,255,255,0.025);
+        }
+
+        .card-header {
+            padding: 32px 38px;
+
+            display: flex;
+            align-items: center;
+
+            gap: 17px;
+
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-icon {
+            width: 54px;
+            height: 54px;
+
+            flex-shrink: 0;
+
+            border-radius: 14px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(239,68,68,0.09);
+
+            border: 1px solid rgba(239,68,68,0.20);
+
+            color: #f87171;
+
+            font-size: 25px;
+
+            box-shadow:
+                inset 0 0 20px rgba(239,68,68,0.04);
+        }
+
+        .card-header h3 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .card-header p {
+            color: #7f8b99;
+            font-size: 13px;
+        }
+
+        .form-content {
+            padding: 36px 38px 42px;
+        }
+
+        /* =========================
+           FORM SECTION
+        ========================= */
+
+        .form-section {
+            margin-bottom: 40px;
+        }
+
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-section-title {
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            margin-bottom: 22px;
+        }
+
+        .section-number {
+            width: 34px;
+            height: 34px;
+
+            border-radius: 10px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(239,68,68,0.09);
+
+            border: 1px solid rgba(239,68,68,0.15);
+
+            color: #f87171;
+
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .form-section-title h4 {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        /* =========================
+           FORM GRID
+        ========================= */
+
+        .form-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+
+            gap: 9px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            color: #d8dee6;
+
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            height: 50px;
+
+            padding: 0 15px;
+
+            border-radius: 11px;
+
+            border: 1px solid rgba(255,255,255,0.09);
+
+            background: #090e15;
+
+            color: #edf1f5;
+
+            outline: none;
+
+            font-size: 14px;
+
+            transition:
+                border-color 0.25s ease,
+                box-shadow 0.25s ease,
+                background 0.25s ease;
+        }
+
+        .form-group input::placeholder {
+            color: #5d6977;
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .form-group select option {
+            background: #0d131b;
+            color: white;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover {
+            border-color: rgba(239,68,68,0.28);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: rgba(239,68,68,0.75);
+
+            background: #0b1017;
+
+            box-shadow:
+                0 0 0 3px rgba(239,68,68,0.08),
+                0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        /* =========================
+           PATIENT NAME
+        ========================= */
+
+        .patient-name-box {
+            grid-column: 1 / -1;
+        }
+
+        .patient-name-box input {
+            height: 56px;
+
+            font-size: 15px;
+
+            border-color: rgba(239,68,68,0.18);
+        }
+
+        .patient-name-box input:focus,
+        .patient-id-box input:focus {
+            border-color: rgba(239,68,68,0.80);
+
+            box-shadow:
+                0 0 0 3px rgba(239,68,68,0.09),
+                0 8px 30px rgba(239,68,68,0.06);
+        }
+
+        .patient-id-box input {
+            border-color: rgba(255,255,255,0.09);
+        }
+
+        .field-hint {
+            color: #596675;
+            font-size: 11px;
+        }
+
+        /* =========================
+           SUBMIT
+        ========================= */
+
+        .submit-area {
+            margin-top: 38px;
+
+            padding-top: 30px;
+
+            border-top: 1px solid var(--border);
+
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .submit-button {
+            min-width: 235px;
+            height: 54px;
+
+            border: none;
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ef4444,
+                    #b91c1c
+                );
+
+            color: white;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 10px;
+
+            box-shadow:
+                0 12px 30px rgba(239,68,68,0.18);
+
+            transition: 0.25s ease;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 17px 38px rgba(239,68,68,0.28);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        .submit-button.loading {
+            opacity: 0.72;
+            cursor: wait;
+            transform: none;
+        }
+
+        .arrow {
+            font-size: 18px;
+        }
+
+        /* =========================
+           INFO CARDS
+        ========================= */
+
+        .info-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 18px;
+
+            margin-top: 22px;
+        }
+
+        .info-card {
+            padding: 23px;
+
+            border-radius: 17px;
+
+            background: rgba(14,19,27,0.85);
+
+            border: 1px solid rgba(255,255,255,0.07);
+
+            transition: 0.25s ease;
+        }
+
+        .info-card:hover {
+            border-color: rgba(239,68,68,0.18);
+
+            transform: translateY(-2px);
+        }
+
+        .info-card-icon {
+            font-size: 19px;
+
+            margin-bottom: 12px;
+        }
+
+        .info-card h5 {
+            font-size: 14px;
+
+            margin-bottom: 7px;
+        }
+
+        .info-card p {
+            color: #707d8c;
+
+            font-size: 12px;
+
+            line-height: 1.6;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            max-width: 1180px;
+            margin: auto;
+
+            padding: 0 24px 35px;
+
+            text-align: center;
+
+            color: #566372;
+
+            font-size: 12px;
+        }
+
+        .medical-note {
+            margin-top: 8px;
+            color: #485563;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 800px) {
+
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .nav-links a:not(.dashboard-btn) {
+                display: none;
+            }
+
+            .hero {
+                padding-top: 45px;
+            }
+
+            .hero h1 {
+                font-size: 40px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .patient-name-box,
+            .full-width {
+                grid-column: auto;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-header,
+            .form-content {
+                padding-left: 22px;
+                padding-right: 22px;
+            }
+
+            .submit-area {
+                justify-content: stretch;
+            }
+
+            .submit-button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .brand-text {
+                font-size: 17px;
+            }
+
+            .brand-icon {
+                width: 38px;
+                height: 38px;
+            }
+
+            .hero h1 {
+                font-size: 34px;
+            }
+
+            .section-heading h2 {
+                font-size: 27px;
+            }
+
+            .card-header {
+                align-items: flex-start;
+            }
+
+            .card-icon {
+                width: 48px;
+                height: 48px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="container">
-
-<div class="header">
-    <span>❤️</span>
-    <h1>Heart Disease Risk Analyzer</h1>
+<!-- ===== PHASE 7 AUTH ADDITION (ONLY ADDITION) ===== -->
+<div class="phase7-auth-bar" style="display:flex;gap:10px;align-items:center;justify-content:flex-end;margin:10px 0;padding:10px;border-radius:10px;background:#0f172a;border:1px solid #334155;position:relative;z-index:20;">
+    <span>{{ session.get('full_name', 'User') }} · {{ session.get('role', 'USER') }}</span>
+    {% if session.get('role') == 'ADMIN' %}<a href="{{ url_for('admin_dashboard') }}">Admin Panel</a>{% elif session.get('role') == 'DOCTOR' %}<a href="{{ url_for('doctor_dashboard') }}">Doctor Panel</a>{% else %}<a href="{{ url_for('dashboard') }}">Dashboard</a>{% endif %}
+    <a href="{{ url_for('logout') }}">Logout</a>
 </div>
 
-<form action="/predict" method="POST">
-<div class="form-grid">
 
-<div>
-<label>Age</label>
-<input type="number" name="age" required>
-</div>
+    <!-- =========================
+         NAVBAR
+    ========================== -->
 
-<div>
-<label>Gender</label>
-<select name="gender">
-<option value="1">Male</option>
-<option value="0">Female</option>
-</select>
-</div>
+    <nav class="navbar">
 
-<div>
-<label>Chest Pain</label>
-<select name="chestpain">
-<option value="0">Typical</option>
-<option value="1">Atypical</option>
-<option value="2">Non-anginal</option>
-<option value="3">Asymptomatic</option>
-</select>
-</div>
+        <a href="{{ url_for('prediction') }}" class="brand">
 
-<div>
-<label>Resting BP</label>
-<input type="number" name="restingBP" required>
-</div>
+            <div class="brand-icon">
+                ♥
+            </div>
 
-<div>
-<label>Cholesterol</label>
-<input type="number" name="serumcholestrol" required>
-</div>
+            <div class="brand-text">
+                Heart<span>AI</span>
+            </div>
 
-<div>
-<label>Fasting Sugar</label>
-<select name="fastingbloodsugar">
-<option value="1">>120</option>
-<option value="0"><=120</option>
-</select>
-</div>
+        </a>
 
-<div>
-<label>Rest ECG</label>
-<select name="restingrelectro">
-<option value="0">Normal</option>
-<option value="1">Abnormal</option>
-<option value="2">Hypertrophy</option>
-</select>
-</div>
+        <div class="nav-links">
 
-<div>
-<label>Max Heart Rate</label>
-<input type="number" name="maxheartrate" required>
-</div>
+            <a href="{{ url_for('prediction') }}" class="active">
+                Prediction
+            </a>
 
-<div>
-<label>Exercise Angina</label>
-<select name="exerciseangia">
-<option value="1">Yes</option>
-<option value="0">No</option>
-</select>
-</div>
+            <a
+                href="{{ url_for('dashboard') }}"
+                class="dashboard-btn"
+            >
+                Dashboard
+            </a>
 
-<div>
-<label>Oldpeak</label>
-<input type="number" step="0.1" name="oldpeak" required>
-</div>
+        </div>
 
-<div>
-<label>Slope</label>
-<select name="slope">
-<option value="0">Up</option>
-<option value="1">Flat</option>
-<option value="2">Down</option>
-</select>
-</div>
+    </nav>
 
-<div>
-<label>Major Vessels</label>
-<input type="number" name="noofmajorvessels" required>
-</div>
 
-<div>
-<label>Thal</label>
-<select name="thal">
-<option value="1">Normal</option>
-<option value="2">Fixed</option>
-<option value="3">Reversible</option>
-</select>
-</div>
+    <!-- =========================
+         HERO
+    ========================== -->
 
-<div class="full">
-<button type="submit">🚀 Predict Risk</button>
-</div>
+    <section class="hero">
 
-</div>
-</form>
+        <div class="hero-badge">
+            AI-ASSISTED CARDIOVASCULAR ANALYSIS
+        </div>
 
-</div>
+        <h1>
+            Intelligent Heart Disease
+            <span>Assessment</span>
+        </h1>
+
+        <p>
+            Enter clinical information to generate an AI-assisted
+            heart disease risk prediction, detection indication,
+            and risk classification.
+        </p>
+
+    </section>
+
+
+    <!-- =========================
+         MAIN
+    ========================== -->
+
+    <main class="main-container">
+
+        <div class="section-heading">
+
+            <h2>
+                Patient Clinical Assessment
+            </h2>
+
+            <p>
+                Enter accurate patient information before starting the prediction.
+            </p>
+
+        </div>
+
+
+        <!-- =========================
+             ASSESSMENT CARD
+        ========================== -->
+
+        <div class="assessment-card">
+
+            <div class="card-header">
+
+                <div class="card-icon">
+                    +
+                </div>
+
+                <div>
+                    <h3>
+                        Clinical Information
+                    </h3>
+
+                    <p>
+                        Enter the patient's details and clinical parameters.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="form-content">
+
+                
+                    {% if session.get('patient_id') %}
+                    <input type="hidden" name="patient_id" value="{{ session.get('patient_id') }}">
+                    <input type="hidden" name="patient_name" value="{{ session.get('full_name', '') }}">
+                    {% endif %}
+
+<form
+                    id="predictionForm"
+                    action="{{ url_for('predict') }}"
+                    method="POST"
+                >
+
+                    <!-- =========================
+                         PATIENT INFORMATION
+                    ========================== -->
+
+                    <div class="form-section">
+
+                        <div class="form-section-title">
+
+                            <div class="section-number">
+                                01
+                            </div>
+
+                            <h4>
+                                Patient Information
+                            </h4>
+
+                        </div>
+
+                        <div class="form-grid">
+
+                            <div class="form-group patient-name-box">
+
+                                <label for="patient_name">
+                                    Patient Name
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="patient_name"
+                                    name="patient_name"
+                                    placeholder="Enter patient's full name"
+                                    autocomplete="name"
+                                    required
+                                >
+
+                                <span class="field-hint">
+                                    Patient name will appear on the prediction result and generated report.
+                                </span>
+
+                            </div>
+
+                            <div class="form-group patient-id-box">
+                                <label for="patient_id">
+                                    Patient ID
+                                    <span style="color:#707d8c;font-weight:500;">(Optional)</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="patient_id"
+                                    name="patient_id"
+                                    placeholder="Enter existing Patient ID, e.g. PAT-8F42K7"
+                                    autocomplete="off"
+                                    maxlength="20"
+                                    pattern="PAT-[A-Za-z0-9]{6}"
+                                    title="Enter a valid Patient ID such as PAT-8F42K7, or leave it blank for a new patient."
+                                >
+
+                                <span class="field-hint">
+                                    Leave blank for a new patient. For a returning patient, enter the Patient ID from their previous report.
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================
+                         DEMOGRAPHICS
+                    ========================== -->
+
+                    <div class="form-section">
+
+                        <div class="form-section-title">
+
+                            <div class="section-number">
+                                02
+                            </div>
+
+                            <h4>
+                                Patient Demographics
+                            </h4>
+
+                        </div>
+
+                        <div class="form-grid">
+
+                            <!-- AGE -->
+
+                            <div class="form-group">
+
+                                <label for="age">
+                                    Age
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="age"
+                                    name="age"
+                                    min="1"
+                                    max="120"
+                                    placeholder="Enter age"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- GENDER -->
+
+                            <div class="form-group">
+
+                                <label for="gender">
+                                    Gender
+                                    <span class="required">*</span>
+                                </label>
+
+                                <select
+                                    id="gender"
+                                    name="gender"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select gender
+                                    </option>
+
+                                    <option value="0">
+                                        Female
+                                    </option>
+
+                                    <option value="1">
+                                        Male
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================
+                         CLINICAL PARAMETERS
+                    ========================== -->
+
+                    <div class="form-section">
+
+                        <div class="form-section-title">
+
+                            <div class="section-number">
+                                03
+                            </div>
+
+                            <h4>
+                                Cardiac & Clinical Parameters
+                            </h4>
+
+                        </div>
+
+                        <div class="form-grid">
+
+                            <!-- CHEST PAIN -->
+
+                            <div class="form-group">
+
+                                <label for="chestpain">
+                                    Chest Pain Type
+                                    <span class="required">*</span>
+                                </label>
+
+                                <select
+                                    id="chestpain"
+                                    name="chestpain"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select chest pain type
+                                    </option>
+
+                                    <option value="0">
+                                        Typical Angina
+                                    </option>
+
+                                    <option value="1">
+                                        Atypical Angina
+                                    </option>
+
+                                    <option value="2">
+                                        Non-Anginal Pain
+                                    </option>
+
+                                    <option value="3">
+                                        Asymptomatic
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- RESTING BP -->
+
+                            <div class="form-group">
+
+                                <label for="restingBP">
+                                    Resting Blood Pressure
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="restingBP"
+                                    name="restingBP"
+                                    min="50"
+                                    max="250"
+                                    placeholder="e.g. 120"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- CHOLESTEROL -->
+
+                            <div class="form-group">
+
+                                <label for="serumcholestrol">
+                                    Serum Cholesterol
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="serumcholestrol"
+                                    name="serumcholestrol"
+                                    min="50"
+                                    max="700"
+                                    placeholder="e.g. 200"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- FASTING BLOOD SUGAR -->
+
+                            <div class="form-group">
+
+                                <label for="fastingbloodsugar">
+                                    Fasting Blood Sugar
+                                    <span class="required">*</span>
+                                </label>
+
+                                <select
+                                    id="fastingbloodsugar"
+                                    name="fastingbloodsugar"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select value
+                                    </option>
+
+                                    <option value="0">
+                                        ≤ 120 mg/dl
+                                    </option>
+
+                                    <option value="1">
+                                        &gt; 120 mg/dl
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- RESTING ECG -->
+
+                            <div class="form-group">
+
+                                <label for="restingrelectro">
+                                    Resting ECG
+                                    <span class="required">*</span>
+                                </label>
+
+                                <select
+                                    id="restingrelectro"
+                                    name="restingrelectro"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select ECG result
+                                    </option>
+
+                                    <option value="0">
+                                        Normal
+                                    </option>
+
+                                    <option value="1">
+                                        ST-T Wave Abnormality
+                                    </option>
+
+                                    <option value="2">
+                                        Left Ventricular Hypertrophy
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- MAX HEART RATE -->
+
+                            <div class="form-group">
+
+                                <label for="maxheartrate">
+                                    Maximum Heart Rate
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="maxheartrate"
+                                    name="maxheartrate"
+                                    min="50"
+                                    max="250"
+                                    placeholder="e.g. 150"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- EXERCISE ANGINA -->
+
+                            <div class="form-group">
+
+                                <label for="exerciseangia">
+                                    Exercise-Induced Angina
+                                    <span class="required">*</span>
+                                </label>
+
+                                <select
+                                    id="exerciseangia"
+                                    name="exerciseangia"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select option
+                                    </option>
+
+                                    <option value="0">
+                                        No
+                                    </option>
+
+                                    <option value="1">
+                                        Yes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- OLDPEAK -->
+
+                            <div class="form-group">
+
+                                <label for="oldpeak">
+                                    ST Depression (Oldpeak)
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="oldpeak"
+                                    name="oldpeak"
+                                    min="0"
+                                    max="10"
+                                    step="0.1"
+                                    placeholder="e.g. 1.2"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- SLOPE -->
+
+                            <div class="form-group">
+
+                                <label for="slope">
+                                    ST Segment Slope
+                                    <span class="required">*</span>
+                                </label>
+
+                                <select
+                                    id="slope"
+                                    name="slope"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select slope
+                                    </option>
+
+                                    <option value="0">
+                                        Upsloping
+                                    </option>
+
+                                    <option value="1">
+                                        Flat
+                                    </option>
+
+                                    <option value="2">
+                                        Downsloping
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- MAJOR VESSELS -->
+
+                            <div class="form-group">
+
+                                <label for="noofmajorvessels">
+                                    Number of Major Vessels
+                                    <span class="required">*</span>
+                                </label>
+
+                                <select
+                                    id="noofmajorvessels"
+                                    name="noofmajorvessels"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select number
+                                    </option>
+
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- THAL -->
+
+                            <div class="form-group full-width">
+
+                                <label for="thal">
+                                    Thalassemia
+                                    <span class="required">*</span>
+                                </label>
+
+                                <select
+                                    id="thal"
+                                    name="thal"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select result
+                                    </option>
+
+                                    <option value="0">
+                                        Normal
+                                    </option>
+
+                                    <option value="1">
+                                        Fixed Defect
+                                    </option>
+
+                                    <option value="2">
+                                        Reversible Defect
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================
+                         SUBMIT
+                    ========================== -->
+
+                    <div class="submit-area">
+
+                        <button
+                            type="submit"
+                            class="submit-button"
+                            id="submitButton"
+                        >
+
+                            <span id="buttonText">
+                                Analyze Patient
+                            </span>
+
+                            <span class="arrow">
+                                →
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             INFO CARDS
+        ========================== -->
+
+        <div class="info-grid">
+
+            <div class="info-card">
+
+                <div class="info-card-icon">
+                    🧠
+                </div>
+
+                <h5>
+                    AI-Assisted Analysis
+                </h5>
+
+                <p>
+                    The trained model estimates the probability
+                    of heart disease from the entered clinical parameters.
+                </p>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <div class="info-card-icon">
+                    📊
+                </div>
+
+                <h5>
+                    Risk Classification
+                </h5>
+
+                <p>
+                    The calculated probability is grouped into
+                    Low, Medium, or High risk categories.
+                </p>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <div class="info-card-icon">
+                    🛡
+                </div>
+
+                <h5>
+                    Clinical Information
+                </h5>
+
+                <p>
+                    Accurate patient information helps maintain
+                    meaningful prediction records and reports.
+                </p>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer>
+
+        <div>
+            AI-Driven Heart Disease Prediction, Detection, and Classification System
+        </div>
+
+        <div class="medical-note">
+            This system is intended for educational and AI-assisted
+            analysis purposes and should not replace professional medical diagnosis.
+        </div>
+
+    </footer>
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================== -->
+
+    <script>
+
+        const form = document.getElementById("predictionForm");
+        const button = document.getElementById("submitButton");
+        const buttonText = document.getElementById("buttonText");
+
+        form.addEventListener("submit", function () {
+
+            if (!form.checkValidity()) {
+                return;
+            }
+
+            button.classList.add("loading");
+            button.disabled = true;
+
+            buttonText.textContent =
+                "Analyzing Clinical Data...";
+
+        });
+
+    </script>
 
 </body>
 </html>

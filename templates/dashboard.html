@@ -1,0 +1,3473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Heart AI | Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #06101d;
+            --sidebar: #081524;
+            --card: rgba(13, 28, 46, 0.82);
+            --card-hover: rgba(18, 38, 61, 0.95);
+            --border: rgba(148, 163, 184, 0.13);
+
+            --text: #f8fafc;
+            --muted: #94a3b8;
+
+            --green: #22c55e;
+            --green-soft: rgba(34, 197, 94, 0.10);
+
+            --blue: #38bdf8;
+            --blue-soft: rgba(56, 189, 248, 0.10);
+
+            --orange: #f59e0b;
+            --orange-soft: rgba(245, 158, 11, 0.10);
+
+            --red: #ef4444;
+            --red-soft: rgba(239, 68, 68, 0.10);
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Inter, Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(
+                    circle at 70% 0%,
+                    rgba(56, 189, 248, 0.07),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 20% 70%,
+                    rgba(34, 197, 94, 0.05),
+                    transparent 28%
+                ),
+                var(--bg);
+            color: var(--text);
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        /* ================= LAYOUT ================= */
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 245px;
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            padding: 24px 16px;
+            background: rgba(8, 21, 36, 0.96);
+            border-right: 1px solid var(--border);
+            z-index: 50;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 5px 8px 27px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-icon {
+            width: 39px;
+            height: 39px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #ff3b5f, #ff4b4b);
+            border: 1px solid rgba(255, 59, 95, 0.28);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 19px;
+            font-weight: 800;
+            box-shadow: 0 8px 22px rgba(255, 59, 95, 0.22);
+        }
+
+        .brand h2 {
+            font-size: 17px;
+        }
+
+        .brand span {
+            display: block;
+            margin-top: 2px;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .nav-title {
+            margin: 27px 9px 10px;
+            color: #475569;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.1px;
+            text-transform: uppercase;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 12px;
+            margin: 4px 0;
+            border-radius: 10px;
+            color: #94a3b8;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.035);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(34, 197, 94, 0.10);
+            color: #86efac;
+            border: 1px solid rgba(34, 197, 94, 0.10);
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .sidebar-bottom {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 20px;
+        }
+
+        .medical-note {
+            padding: 15px;
+            border-radius: 13px;
+            background: rgba(56, 189, 248, 0.05);
+            border: 1px solid rgba(56, 189, 248, 0.10);
+        }
+
+        .medical-note strong {
+            display: block;
+            font-size: 11px;
+            margin-bottom: 6px;
+            color: #bae6fd;
+        }
+
+        .medical-note p {
+            color: #64748b;
+            font-size: 10px;
+            line-height: 1.55;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            width: calc(100% - 245px);
+            margin-left: 245px;
+            padding: 30px 34px 50px;
+        }
+
+        /* ================= TOPBAR ================= */
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            font-size: 28px;
+            letter-spacing: -0.7px;
+            margin-bottom: 6px;
+        }
+
+        .page-title p {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-btn {
+            padding: 10px 14px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.025);
+            color: #cbd5e1;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .top-btn:hover {
+            background: rgba(255,255,255,0.06);
+        }
+
+        .new-prediction {
+            background: linear-gradient(135deg, #ff3b5f, #ff4b4b);
+            border-color: #ff3b5f;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 8px 22px rgba(255, 59, 95, 0.20);
+        }
+
+        .new-prediction:hover {
+            background: linear-gradient(135deg, #ff2f54, #ff4141);
+        }
+
+        /* ================= STAT CARDS ================= */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 19px;
+            transition: 0.2s;
+        }
+
+        .stat-card:hover {
+            background: var(--card-hover);
+            transform: translateY(-1px);
+        }
+
+        .stat-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 17px;
+        }
+
+        .stat-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .icon-blue {
+            background: var(--blue-soft);
+            color: var(--blue);
+        }
+
+        .icon-green {
+            background: var(--green-soft);
+            color: #4ade80;
+        }
+
+        .icon-orange {
+            background: var(--orange-soft);
+            color: #fbbf24;
+        }
+
+        .icon-red {
+            background: var(--red-soft);
+            color: #f87171;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .stat-description {
+            color: #64748b;
+            font-size: 10px;
+            margin-top: 5px;
+        }
+
+        /* ================= CONTENT GRID ================= */
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.35fr 0.65fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            padding: 22px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .panel-header h2 {
+            font-size: 15px;
+        }
+
+        .panel-header p {
+            color: var(--muted);
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        .panel-link {
+            color: #7dd3fc;
+            font-size: 10px;
+        }
+
+        /* ================= CHART ================= */
+
+        .chart-area {
+            height: 260px;
+            position: relative;
+            padding: 15px 5px 30px;
+            border-bottom: 1px solid rgba(148,163,184,0.10);
+            overflow: hidden;
+        }
+
+        .chart-grid-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            border-top: 1px solid rgba(148,163,184,0.08);
+            z-index: 0;
+        }
+
+        .grid-one { top: 20%; }
+        .grid-two { top: 40%; }
+        .grid-three { top: 60%; }
+        .grid-four { top: 80%; }
+
+        .activity-svg {
+            position: absolute;
+            left: 5px;
+            right: 5px;
+            top: 15px;
+            bottom: 30px;
+            width: calc(100% - 10px);
+            height: calc(100% - 45px);
+            z-index: 2;
+            overflow: visible;
+        }
+
+        .activity-fill {
+            fill: rgba(255, 59, 104, 0.10);
+        }
+
+        .activity-line {
+            fill: none;
+            stroke: #ff3b68;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .activity-point {
+            fill: #ff3b68;
+            stroke: #0d1c2e;
+            stroke-width: 2;
+        }
+
+        .activity-label {
+            fill: #64748b;
+            font-size: 9px;
+            text-anchor: middle;
+        }
+
+        .activity-value {
+            fill: #cbd5e1;
+            font-size: 9px;
+            text-anchor: middle;
+        }
+
+        .empty-chart {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 11px;
+        }
+
+        /* ================= RISK DISTRIBUTION ================= */
+
+        .risk-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .donut {
+            width: 165px;
+            height: 165px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #22c55e 0deg,
+                #22c55e 120deg,
+                #f59e0b 120deg,
+                #f59e0b 240deg,
+                #ef4444 240deg,
+                #ef4444 360deg
+            );
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 5px 0 22px;
+        }
+
+        .donut::after {
+            content: "";
+            position: absolute;
+            width: 108px;
+            height: 108px;
+            border-radius: 50%;
+            background: #0d1c2e;
+        }
+
+        .donut-center {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .donut-center strong {
+            display: block;
+            font-size: 25px;
+        }
+
+        .donut-center span {
+            color: #64748b;
+            font-size: 9px;
+        }
+
+        .risk-legend {
+            width: 100%;
+        }
+
+        .risk-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(148,163,184,0.07);
+        }
+
+        .risk-row:last-child {
+            border-bottom: none;
+        }
+
+        .risk-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #cbd5e1;
+            font-size: 11px;
+        }
+
+        .risk-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .low-dot {
+            background: #22c55e;
+        }
+
+        .medium-dot {
+            background: #f59e0b;
+        }
+
+        .high-dot {
+            background: #ef4444;
+        }
+
+        .risk-count {
+            color: #f8fafc;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* ================= RECENT TABLE ================= */
+
+        .table-panel {
+            margin-bottom: 20px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th {
+            padding: 12px 10px;
+            text-align: left;
+            color: #64748b;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 14px 10px;
+            border-bottom: 1px solid rgba(148,163,184,0.07);
+            color: #cbd5e1;
+            font-size: 11px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .patient-name {
+            color: #f8fafc;
+            font-weight: 600;
+        }
+
+        .prediction-id {
+            color: #64748b;
+            font-family: monospace;
+            font-size: 9px;
+        }
+
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .risk-high {
+            background: var(--red-soft);
+            color: #f87171;
+        }
+
+        .risk-medium {
+            background: var(--orange-soft);
+            color: #fbbf24;
+        }
+
+        .risk-low {
+            background: var(--green-soft);
+            color: #4ade80;
+        }
+
+        .empty-table {
+            text-align: center;
+            padding: 35px 15px !important;
+            color: #64748b;
+        }
+
+        /* ================= QUICK ACTIONS ================= */
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 13px;
+        }
+
+        .quick-card {
+            padding: 18px;
+            border-radius: 13px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.02);
+            transition: 0.2s;
+        }
+
+        .quick-card:hover {
+            background: rgba(255,255,255,0.045);
+            transform: translateY(-1px);
+        }
+
+        .quick-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 9px;
+            background: rgba(56,189,248,0.08);
+            color: #7dd3fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .quick-new-icon {
+            background: rgba(255, 59, 95, 0.10);
+            color: #ff6178;
+        }
+
+        .image-analyzer-icon {
+            background: rgba(168, 85, 247, 0.10);
+            color: #c084fc;
+        }
+
+        .quick-card h3 {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .quick-card p {
+            color: #64748b;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        /* ================= LOADING ================= */
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100px;
+            color: #64748b;
+            font-size: 11px;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(148,163,184,0.18);
+            border-top-color: #38bdf8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 9px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+
+        /* ================= MEDICAL REPORT ANALYZER ================= */
+
+        .medical-report-panel {
+            margin-bottom: 20px;
+        }
+
+        .medical-report-content {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .medical-upload-box {
+            border: 1px dashed rgba(56, 189, 248, 0.30);
+            background: rgba(56, 189, 248, 0.035);
+            border-radius: 14px;
+            padding: 24px;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .medical-upload-box:hover {
+            border-color: rgba(56, 189, 248, 0.55);
+            background: rgba(56, 189, 248, 0.055);
+        }
+
+        .medical-upload-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(56, 189, 248, 0.10);
+            color: #7dd3fc;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .medical-upload-box h3 {
+            font-size: 14px;
+            margin-bottom: 7px;
+        }
+
+        .medical-upload-box p {
+            color: #64748b;
+            font-size: 10px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .medical-file-input {
+            display: none;
+        }
+
+        .medical-upload-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.14);
+        }
+
+        .medical-file-name {
+            min-height: 16px;
+            margin-top: 12px;
+            color: #94a3b8;
+            font-size: 10px;
+        }
+
+        .medical-supported {
+            margin-top: 8px;
+            color: #475569;
+            font-size: 9px;
+        }
+
+        .medical-info-box {
+            padding: 20px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.02);
+        }
+
+        .medical-info-box h3 {
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .medical-info-list {
+            display: grid;
+            gap: 9px;
+        }
+
+        .medical-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            color: #94a3b8;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        .medical-info-item strong {
+            color: #cbd5e1;
+        }
+
+        .medical-info-dot {
+            width: 6px;
+            height: 6px;
+            margin-top: 5px;
+            flex: 0 0 auto;
+            border-radius: 50%;
+            background: #38bdf8;
+        }
+
+        .medical-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(2, 6, 23, 0.78);
+            backdrop-filter: blur(7px);
+            z-index: 100;
+        }
+
+        .medical-modal.active {
+            display: flex;
+        }
+
+        .medical-modal-card {
+            width: min(680px, 100%);
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            border-radius: 17px;
+            border: 1px solid var(--border);
+            background: #0d1c2e;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+        }
+
+        .medical-modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .medical-modal-header h2 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .medical-modal-header p {
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        .medical-close {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            color: #cbd5e1;
+            cursor: pointer;
+        }
+
+        .medical-selected-file {
+            padding: 13px;
+            border-radius: 10px;
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            background: rgba(56, 189, 248, 0.045);
+            color: #cbd5e1;
+            font-size: 10px;
+            margin-bottom: 15px;
+        }
+
+        .medical-step-note {
+            padding: 13px;
+            border-radius: 10px;
+            background: rgba(245, 158, 11, 0.06);
+            border: 1px solid rgba(245, 158, 11, 0.13);
+            color: #fbbf24;
+            font-size: 10px;
+            line-height: 1.55;
+        }
+
+        @media (max-width: 800px) {
+            .medical-report-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ================= MOBILE ================= */
+
+        .mobile-top {
+            display: none;
+        }
+
+        @media (max-width: 1100px) {
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                width: 70px;
+                padding: 18px 10px;
+            }
+
+            .brand {
+                justify-content: center;
+                padding: 0 0 20px;
+            }
+
+            .brand-text,
+            .nav-title,
+            .nav-item span:not(.nav-icon),
+            .medical-note {
+                display: none;
+            }
+
+            .nav-item {
+                justify-content: center;
+                padding: 12px 5px;
+            }
+
+            .sidebar-bottom {
+                display: none;
+            }
+
+            .main {
+                width: calc(100% - 70px);
+                margin-left: 70px;
+                padding: 25px 18px 40px;
+            }
+
+            .quick-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 550px) {
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .page-title h1 {
+                font-size: 24px;
+            }
+
+            .top-actions {
+                width: 100%;
+            }
+
+            .top-btn {
+                flex: 1;
+                text-align: center;
+            }
+
+            .main {
+                padding: 20px 13px 35px;
+            }
+
+            .panel {
+                padding: 17px;
+            }
+        }
+    /* ===== PHASE 2 AI ASSISTANT ===== */
+.ai-chat-panel{position:fixed;right:24px;bottom:24px;width:380px;max-width:calc(100vw - 32px);height:560px;background:rgba(15,15,24,.97);border:1px solid rgba(255,80,120,.28);border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.55);z-index:9999;display:none;flex-direction:column;overflow:hidden;backdrop-filter:blur(18px)}
+.ai-chat-panel.open{display:flex}
+.ai-chat-head{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(255,55,105,.14),rgba(255,120,150,.05))}
+.ai-chat-title{display:flex;gap:11px;align-items:center}.ai-chat-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#ff3d73,#ff7898);color:#fff}.ai-chat-name{font-weight:700}.ai-chat-sub{font-size:11px;opacity:.6;margin-top:2px}.ai-close{border:0;background:transparent;color:inherit;font-size:22px;cursor:pointer;opacity:.7}
+.ai-chat-messages{flex:1;overflow:auto;padding:16px}.ai-msg{max-width:86%;padding:11px 13px;border-radius:14px;margin-bottom:10px;font-size:13px;line-height:1.5;white-space:pre-wrap}.ai-msg.bot{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.05);margin-right:auto}.ai-msg.user{background:linear-gradient(135deg,#ff3d73,#ff6688);color:#fff;margin-left:auto}.ai-typing{opacity:.6;font-style:italic}
+.ai-quick{display:flex;gap:7px;overflow-x:auto;padding:0 14px 10px}.ai-quick button{white-space:nowrap;border:1px solid rgba(255,90,130,.25);background:rgba(255,70,110,.08);color:inherit;border-radius:999px;padding:7px 10px;font-size:11px;cursor:pointer}.ai-chat-form{display:flex;gap:8px;padding:12px;border-top:1px solid rgba(255,255,255,.08)}.ai-chat-input{flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:inherit;border-radius:12px;padding:11px 12px;outline:none}.ai-send{width:44px;border:0;border-radius:12px;background:linear-gradient(135deg,#ff3d73,#ff7898);color:#fff;cursor:pointer}.ai-fab{position:fixed;right:24px;bottom:24px;width:58px;height:58px;border:0;border-radius:50%;background:linear-gradient(135deg,#ff3d73,#ff7898);color:#fff;font-size:22px;box-shadow:0 12px 35px rgba(255,61,115,.35);z-index:9998;cursor:pointer}.ai-fab.hidden{display:none}@media(max-width:600px){.ai-chat-panel{right:12px;bottom:12px;width:calc(100vw - 24px);height:70vh}.ai-fab{right:16px;bottom:16px}}
+
+
+.medical-analyze-button{border:0;border-radius:12px;padding:11px 16px;background:linear-gradient(135deg,#2dd4bf,#22c55e);color:#06121a;font-weight:700;cursor:pointer}.medical-analyze-button:disabled{opacity:.55;cursor:not-allowed}.medical-result-card{border:1px solid rgba(45,212,191,.22);background:rgba(4,18,30,.72);border-radius:16px;padding:16px;color:#e8f1f7}.medical-result-title{font-size:18px;font-weight:800;margin-bottom:5px}.medical-result-meta{font-size:12px;opacity:.72;margin-bottom:14px}.medical-values-table{width:100%;border-collapse:collapse;font-size:12px}.medical-values-table th,.medical-values-table td{padding:8px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left}.medical-status-high{color:#ff8a8a}.medical-status-low{color:#ffd27a}.medical-status-within-range{color:#75e6b3}.medical-status-not-detected{color:#aab6c2}.medical-result-section{margin-top:15px;font-size:13px;line-height:1.55}.medical-result-section ul{margin:7px 0 0 18px;padding:0}.medical-disclaimer{margin-top:15px;padding:11px;border-radius:10px;background:rgba(255,193,7,.08);border:1px solid rgba(255,193,7,.18);font-size:11px;line-height:1.5;color:#ffd76a}
+
+</style>
+
+<style>
+.phase5-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-bottom:24px}.phase5-card{padding:20px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.025)}.phase5-card span{display:block;color:#8fa3bd;font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}.phase5-card strong{font-size:28px}.phase5-trend{margin-top:18px}.phase5-trend-row{display:grid;grid-template-columns:90px 1fr 70px;gap:12px;align-items:center;margin:10px 0;font-size:12px}.phase5-bar{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}.phase5-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#5eead4,#60a5fa)}.phase5-empty{color:#8fa3bd;padding:14px 0}.phase5-link{color:#7dd3fc;text-decoration:none;font-size:13px}.phase5-link:hover{text-decoration:underline}@media(max-width:900px){.phase5-grid{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+
+<!-- ===== PHASE 7 AUTH ADDITION (ONLY ADDITION) ===== -->
+<div class="phase7-auth-bar" style="display:flex;gap:10px;align-items:center;justify-content:flex-end;margin:10px 0;padding:10px;border-radius:10px;background:#0f172a;border:1px solid #334155;position:relative;z-index:20;">
+    <span>{{ session.get('full_name', 'User') }} · {{ session.get('role', 'USER') }}</span>
+    {% if session.get('role') == 'ADMIN' %}<a href="{{ url_for('admin_dashboard') }}">Admin Panel</a>{% elif session.get('role') == 'DOCTOR' %}<a href="{{ url_for('doctor_dashboard') }}">Doctor Panel</a>{% else %}<a href="{{ url_for('dashboard') }}">Dashboard</a>{% endif %}
+    <a href="{{ url_for('logout') }}">Logout</a>
+</div>
+
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <a href="{{ url_for('index') }}" class="brand">
+
+            <div class="brand-icon">
+                ♥
+            </div>
+
+            <div class="brand-text">
+                <h2>Heart AI</h2>
+                <span>Clinical Intelligence</span>
+            </div>
+
+        </a>
+
+
+        <div class="nav-title">
+            Main
+        </div>
+
+
+        <a href="{{ url_for('index') }}" class="nav-item">
+
+            <span class="nav-icon">⌂</span>
+            <span>Prediction</span>
+
+        </a>
+
+
+        <a href="{{ url_for('dashboard') }}" class="nav-item active">
+
+            <span class="nav-icon">▦</span>
+            <span>Dashboard</span>
+
+        </a>
+
+
+        <a href="/history" class="nav-item">
+
+            <span class="nav-icon">◷</span>
+            <span>History</span>
+
+        </a>
+
+
+        <div class="nav-title">
+            Analysis
+        </div>
+
+
+        <a href="{{ url_for('index') }}" class="nav-item">
+
+            <span class="nav-icon">⌁</span>
+            <span>New Assessment</span>
+
+        </a>
+
+
+        <div class="nav-title">
+            System
+        </div>
+
+
+        <a href="{{ url_for('index') }}" class="nav-item">
+
+            <span class="nav-icon">⚙</span>
+            <span>Settings</span>
+
+        </a>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="medical-note">
+
+                <strong>
+                    AI-Assisted System
+                </strong>
+
+                <p>
+                    Results are intended for educational and research
+                    purposes and should not replace professional medical
+                    evaluation.
+                </p>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <!-- TOPBAR -->
+
+        <div class="topbar">
+
+            <div class="page-title">
+
+                <h1>
+                    Clinical Dashboard
+                </h1>
+
+                <p>
+                    Overview of heart disease prediction activity and risk distribution.
+                </p>
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <button
+                    class="top-btn"
+                    onclick="loadDashboard()"
+                    id="refreshButton"
+                >
+                    ↻ Refresh
+                </button>
+
+                <a
+                    href="{{ url_for('prediction') }}"
+                    class="top-btn new-prediction"
+                >
+                    + New Prediction
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= STATISTICS ================= -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div>
+                        <div class="stat-label">
+                            Total Predictions
+                        </div>
+
+                        <div
+                            class="stat-value"
+                            id="totalPredictions"
+                        >
+                            —
+                        </div>
+                    </div>
+
+                    <div class="stat-icon icon-blue">
+                        #
+                    </div>
+
+                </div>
+
+                <div class="stat-description">
+                    All saved clinical assessments
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div>
+                        <div class="stat-label">
+                            High Risk
+                        </div>
+
+                        <div
+                            class="stat-value"
+                            id="highRisk"
+                        >
+                            —
+                        </div>
+                    </div>
+
+                    <div class="stat-icon icon-red">
+                        !
+                    </div>
+
+                </div>
+
+                <div class="stat-description">
+                    High-risk classifications
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div>
+                        <div class="stat-label">
+                            Medium Risk
+                        </div>
+
+                        <div
+                            class="stat-value"
+                            id="mediumRisk"
+                        >
+                            —
+                        </div>
+                    </div>
+
+                    <div class="stat-icon icon-orange">
+                        ~
+                    </div>
+
+                </div>
+
+                <div class="stat-description">
+                    Medium-risk classifications
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div>
+                        <div class="stat-label">
+                            Low Risk
+                        </div>
+
+                        <div
+                            class="stat-value"
+                            id="lowRisk"
+                        >
+                            —
+                        </div>
+                    </div>
+
+                    <div class="stat-icon icon-green">
+                        ✓
+                    </div>
+
+                </div>
+
+                <div class="stat-description">
+                    Low-risk classifications
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= CHARTS ================= -->
+
+        <section class="content-grid">
+
+            <!-- ACTIVITY -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>
+                            Prediction Activity
+                        </h2>
+
+                        <p>
+                            Recent prediction volume
+                        </p>
+                    </div>
+
+                    <span class="panel-link">
+                        Live Data
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="chart-area"
+                    id="activityChart"
+                >
+
+                    <div class="chart-grid-line grid-one"></div>
+                    <div class="chart-grid-line grid-two"></div>
+                    <div class="chart-grid-line grid-three"></div>
+                    <div class="chart-grid-line grid-four"></div>
+
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading activity...
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- RISK -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>
+                            Risk Distribution
+                        </h2>
+
+                        <p>
+                            Current classification breakdown
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="risk-content">
+
+                    <div
+                        class="donut"
+                        id="riskDonut"
+                    >
+
+                        <div class="donut-center">
+
+                            <strong id="riskTotal">
+                                —
+                            </strong>
+
+                            <span>
+                                Predictions
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="risk-legend">
+
+                        <div class="risk-row">
+
+                            <div class="risk-name">
+
+                                <span class="risk-dot low-dot"></span>
+
+                                Low Risk
+
+                            </div>
+
+                            <span
+                                class="risk-count"
+                                id="lowRiskLegend"
+                            >
+                                —
+                            </span>
+
+                        </div>
+
+
+                        <div class="risk-row">
+
+                            <div class="risk-name">
+
+                                <span class="risk-dot medium-dot"></span>
+
+                                Medium Risk
+
+                            </div>
+
+                            <span
+                                class="risk-count"
+                                id="mediumRiskLegend"
+                            >
+                                —
+                            </span>
+
+                        </div>
+
+
+                        <div class="risk-row">
+
+                            <div class="risk-name">
+
+                                <span class="risk-dot high-dot"></span>
+
+                                High Risk
+
+                            </div>
+
+                            <span
+                                class="risk-count"
+                                id="highRiskLegend"
+                            >
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================= PHASE 5 HISTORY & ANALYTICS ================= -->
+        <section class="panel" id="historyAnalyticsPanel">
+            <div class="panel-header">
+                <div>
+                    <h2>History &amp; Analytics</h2>
+                    <p>Track prediction history, patient activity, risk trends and medical report records.</p>
+                </div>
+                <a href="/history" class="phase5-link">Open Full History →</a>
+            </div>
+            <div class="phase5-grid">
+                <div class="phase5-card"><span>Total Patients</span><strong id="analyticsPatients">—</strong></div>
+                <div class="phase5-card"><span>Average Risk Score</span><strong id="analyticsAvgRisk">—</strong></div>
+                <div class="phase5-card"><span>Medical Reports</span><strong id="analyticsReports">—</strong></div>
+            </div>
+            <div class="phase5-trend">
+                <div class="panel-header" style="margin-bottom:8px">
+                    <div><h3 style="margin:0">Prediction Risk Trend</h3><p style="margin:4px 0 0">Daily prediction count and average risk score.</p></div>
+                </div>
+                <div id="phase5Trend"><div class="phase5-empty">Loading analytics...</div></div>
+            </div>
+        </section>
+
+        <!-- ================= RECENT PREDICTIONS ================= -->
+
+        <section class="panel table-panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <h2>
+                        Recent Predictions
+                    </h2>
+
+                    <p>
+                        Latest saved clinical assessments
+                    </p>
+                </div>
+
+                <a
+                    href="/history"
+                    class="panel-link"
+                >
+                    View History →
+                </a>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Patient
+                            </th>
+
+                            <th>
+                                Prediction ID
+                            </th>
+
+                            <th>
+                                Risk
+                            </th>
+
+                            <th>
+                                Risk Score
+                            </th>
+
+                            <th>
+                                Detection
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="recentTable">
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="empty-table"
+                            >
+                                Loading predictions...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================= MEDICAL REPORT / OCR ANALYZER ================= -->
+
+        <section class="panel medical-report-panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <h2>
+                        Medical Report Analyzer
+                    </h2>
+
+                    <p>
+                        Upload a medical or blood report for AI-assisted OCR analysis.
+                    </p>
+                </div>
+
+                <span class="panel-link">
+                    Phase 4
+                </span>
+
+            </div>
+
+
+            <div class="medical-report-content">
+
+                <div class="medical-upload-box">
+
+                    <div class="medical-upload-icon">
+                        OCR
+                    </div>
+
+                    <h3>
+                        Upload Medical Report
+                    </h3>
+
+                    <p>
+                        Select a medical report, blood report, or laboratory
+                        document. The report will be processed in the next
+                        Phase 4 backend step.
+                    </p>
+
+                    <input
+                        type="file"
+                        id="medicalReportFile"
+                        class="medical-file-input"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onchange="handleMedicalReportSelection(this)"
+                    >
+
+                    <label
+                        for="medicalReportFile"
+                        class="medical-upload-button"
+                    >
+                        Choose Report
+                    </label>
+
+                    <div
+                        class="medical-file-name"
+                        id="medicalFileName"
+                    >
+                        No file selected
+                    </div>
+
+                    <div class="medical-supported">
+                        Supported formats: PDF, JPG, JPEG, PNG
+                    </div>
+
+                </div>
+
+
+                <div class="medical-info-box">
+
+                    <h3>
+                        Analysis Workflow
+                    </h3>
+
+                    <div class="medical-info-list">
+
+                        <div class="medical-info-item">
+                            <span class="medical-info-dot"></span>
+                            <span>
+                                <strong>Upload:</strong>
+                                Select a readable medical report.
+                            </span>
+                        </div>
+
+                        <div class="medical-info-item">
+                            <span class="medical-info-dot"></span>
+                            <span>
+                                <strong>OCR:</strong>
+                                Extract readable text and report values.
+                            </span>
+                        </div>
+
+                        <div class="medical-info-item">
+                            <span class="medical-info-dot"></span>
+                            <span>
+                                <strong>Analysis:</strong>
+                                Identify available clinical parameters.
+                            </span>
+                        </div>
+
+                        <div class="medical-info-item">
+                            <span class="medical-info-dot"></span>
+                            <span>
+                                <strong>AI Assistance:</strong>
+                                Explain findings in simple language.
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= MEDICAL REPORT MODAL ================= -->
+
+        <div
+            class="medical-modal"
+            id="medicalReportModal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="medicalReportModalTitle"
+        >
+
+            <div class="medical-modal-card">
+
+                <div class="medical-modal-header">
+
+                    <div>
+                        <h2 id="medicalReportModalTitle">
+                            Medical Report Analyzer
+                        </h2>
+
+                        <p>
+                            Review the selected report before backend OCR
+                            processing is connected.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="medical-close"
+                        onclick="closeMedicalReportModal()"
+                        aria-label="Close"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="medical-selected-file"
+                    id="medicalSelectedFile"
+                >
+                    No file selected.
+                </div>
+
+
+                <div class="medical-step-note" id="medicalStepNote">
+                    Upload the selected report to validate the file, extract medical values, and generate an AI-assisted screening explanation.
+                </div>
+
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
+                    <button type="button" class="medical-analyze-button" id="medicalAnalyzeButton" onclick="analyzeMedicalReport()">
+                        Analyze Medical Report
+                    </button>
+                    <button type="button" class="medical-analyze-button" onclick="closeMedicalReportModal()" style="opacity:.8;">
+                        Cancel
+                    </button>
+                </div>
+
+                <div id="medicalReportResult" style="display:none;margin-top:18px;">
+                    <div class="medical-result-card">
+                        <div class="medical-result-title">Medical Report Analysis</div>
+                        <div id="medicalResultMeta" class="medical-result-meta"></div>
+                        <div id="medicalValuesTable"></div>
+                        <div class="medical-result-section"><strong>AI-Assisted Explanation</strong><p id="medicalExplanation"></p></div>
+                        <div class="medical-result-section"><strong>Heart-Health Observations</strong><ul id="medicalObservations"></ul></div>
+                        <div class="medical-result-section"><strong>Points to Discuss With a Doctor</strong><ul id="medicalDoctorPoints"></ul></div>
+                        <div class="medical-disclaimer" id="medicalDisclaimer"></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= QUICK ACTIONS ================= -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <h2>
+                        Quick Actions
+                    </h2>
+
+                    <p>
+                        Continue working with the Heart AI system
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="quick-grid">
+
+                <a
+                    href="{{ url_for('prediction') }}"
+                    class="quick-card"
+                >
+
+                    <div class="quick-icon quick-new-icon">
+                        +
+                    </div>
+
+                    <h3>
+                        New Prediction
+                    </h3>
+
+                    <p>
+                        Enter a new patient's clinical information and
+                        generate a risk assessment.
+                    </p>
+
+                </a>
+
+
+                <a
+                    href="/history"
+                    class="quick-card"
+                >
+
+                    <div class="quick-icon">
+                        ◷
+                    </div>
+
+                    <h3>
+                        Prediction History
+                    </h3>
+
+                    <p>
+                        Review previously saved prediction records and
+                        their clinical results.
+                    </p>
+
+                </a>
+
+
+                <div class="quick-card">
+
+                    <div class="quick-icon">
+                        AI
+                    </div>
+
+                    <h3>
+                        AI Assistant
+                    </h3>
+
+                    <p>
+                        AI-assisted result explanations and medical
+                        information support will be integrated here.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="#"
+                    class="quick-card"
+                    onclick="openImageAnalyzer(event)"
+                >
+
+                    <div class="quick-icon image-analyzer-icon">
+                        IMG
+                    </div>
+
+                    <h3>
+                        Image Report Analyzer
+                    </h3>
+
+                    <p>
+                        Upload medical reports or images for AI-assisted
+                        analysis and extracted clinical information.
+                    </p>
+
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    /*
+     * ============================================
+     * HEART AI DASHBOARD
+     * ============================================
+     *
+     * Data source:
+     *
+     *     /api/dashboard
+     *
+     * This page does not use hard-coded statistics.
+     * It reads the data saved by app.py in SQLite.
+     */
+
+
+    function openImageAnalyzer(event) {
+
+        event.preventDefault();
+
+        const modal =
+            document.getElementById("medicalReportModal");
+
+        if (modal) {
+            modal.classList.add("active");
+        }
+    }
+
+
+    function handleMedicalReportSelection(input) {
+
+        const fileName =
+            document.getElementById("medicalFileName");
+
+        const selectedFile =
+            document.getElementById("medicalSelectedFile");
+
+        if (!input.files || input.files.length === 0) {
+
+            fileName.textContent =
+                "No file selected";
+
+            selectedFile.textContent =
+                "No file selected.";
+
+            return;
+        }
+
+        const file =
+            input.files[0];
+
+        fileName.textContent =
+            file.name;
+
+        selectedFile.textContent =
+            "Selected file: " +
+            file.name +
+            " (" +
+            formatFileSize(file.size) +
+            ")";
+
+        const modal =
+            document.getElementById("medicalReportModal");
+
+        if (modal) {
+            modal.classList.add("active");
+        }
+    }
+
+
+    function formatFileSize(bytes) {
+
+        if (!Number.isFinite(bytes) || bytes <= 0) {
+            return "0 B";
+        }
+
+        const units = [
+            "B",
+            "KB",
+            "MB",
+            "GB"
+        ];
+
+        const index =
+            Math.min(
+                Math.floor(Math.log(bytes) / Math.log(1024)),
+                units.length - 1
+            );
+
+        const size =
+            bytes / Math.pow(1024, index);
+
+        return size.toFixed(
+            index === 0 ? 0 : 1
+        ) + " " + units[index];
+    }
+
+
+    function closeMedicalReportModal() {
+
+        const modal =
+            document.getElementById("medicalReportModal");
+
+        if (modal) {
+            modal.classList.remove("active");
+        }
+    }
+
+
+    document.addEventListener(
+        "click",
+        function(event) {
+
+            const modal =
+                document.getElementById("medicalReportModal");
+
+            if (
+                modal &&
+                event.target === modal
+            ) {
+                closeMedicalReportModal();
+            }
+        }
+    );
+
+
+    document.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Escape") {
+                closeMedicalReportModal();
+            }
+        }
+    );
+
+
+    async function loadDashboard() {
+
+        const refreshButton =
+            document.getElementById("refreshButton");
+
+        refreshButton.textContent = "↻ Loading...";
+
+        try {
+
+            const response = await fetch("/api/dashboard", {
+                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    "Dashboard API returned " + response.status
+                );
+            }
+
+            const data = await response.json();
+
+            console.log("Dashboard data:", data);
+
+            updateStatistics(data);
+
+            updateRiskDistribution(data);
+
+            updateRecentPredictions(data);
+
+            updateActivityChart(data);
+
+        } catch (error) {
+
+            console.error(
+                "Dashboard loading error:",
+                error
+            );
+
+            showDashboardError();
+
+        } finally {
+
+            refreshButton.textContent = "↻ Refresh";
+
+        }
+
+    }
+
+
+
+    async function loadHistoryAnalytics() {
+        try {
+            const response = await fetch("/api/history-analytics", {cache:"no-store"});
+            if (!response.ok) throw new Error("Analytics API returned " + response.status);
+            const data = await response.json();
+            document.getElementById("analyticsPatients").textContent = Number(data.total_patients || 0);
+            document.getElementById("analyticsAvgRisk").textContent = Number(data.average_risk_score || 0).toFixed(1) + "%";
+            document.getElementById("analyticsReports").textContent = Number(data.total_medical_reports || 0);
+            const rows = data.prediction_trend || [];
+            const host = document.getElementById("phase5Trend");
+            if (!rows.length) { host.innerHTML = '<div class="phase5-empty">No prediction history available yet.</div>'; return; }
+            const maxRisk = Math.max(...rows.map(r => Number(r.avg_risk || 0)), 1);
+            host.innerHTML = rows.slice(-10).map(r => {
+                const risk = Number(r.avg_risk || 0);
+                const count = Number(r.count || 0);
+                const width = Math.max(4, Math.min(100, (risk / maxRisk) * 100));
+                return `<div class="phase5-trend-row"><span>${escapeHtml(r.date || "—")}</span><div class="phase5-bar"><i style="width:${width}%"></i></div><span>${risk.toFixed(1)}% (${count})</span></div>`;
+            }).join("");
+        } catch (error) {
+            console.error("History analytics loading error:", error);
+            document.getElementById("phase5Trend").innerHTML = '<div class="phase5-empty">Analytics could not be loaded. Please refresh the page.</div>';
+        }
+    }
+
+    /* ================= STATISTICS ================= */
+
+    function updateStatistics(data) {
+
+        /*
+         * app.py returns dashboard statistics.
+         *
+         * We support both direct values and
+         * common nested structures so the
+         * frontend remains easy to extend.
+         */
+
+        const total =
+            Number(
+                data.total_predictions ??
+                data.total ??
+                data.statistics?.total_predictions ??
+                0
+            );
+
+        const high =
+            Number(
+                data.high_risk ??
+                data.high ??
+                data.statistics?.high_risk ??
+                0
+            );
+
+        const medium =
+            Number(
+                data.medium_risk ??
+                data.medium ??
+                data.statistics?.medium_risk ??
+                0
+            );
+
+        const low =
+            Number(
+                data.low_risk ??
+                data.low ??
+                data.statistics?.low_risk ??
+                0
+            );
+
+
+        document.getElementById(
+            "totalPredictions"
+        ).textContent = total;
+
+
+        document.getElementById(
+            "highRisk"
+        ).textContent = high;
+
+
+        document.getElementById(
+            "mediumRisk"
+        ).textContent = medium;
+
+
+        document.getElementById(
+            "lowRisk"
+        ).textContent = low;
+
+
+        document.getElementById(
+            "riskTotal"
+        ).textContent = total;
+
+
+        document.getElementById(
+            "lowRiskLegend"
+        ).textContent = low;
+
+
+        document.getElementById(
+            "mediumRiskLegend"
+        ).textContent = medium;
+
+
+        document.getElementById(
+            "highRiskLegend"
+        ).textContent = high;
+
+    }
+
+
+    /* ================= RISK DONUT ================= */
+
+    function updateRiskDistribution(data) {
+
+        const total =
+            Number(
+                data.total_predictions ??
+                data.total ??
+                data.statistics?.total_predictions ??
+                0
+            );
+
+        const high =
+            Number(
+                data.high_risk ??
+                data.high ??
+                data.statistics?.high_risk ??
+                0
+            );
+
+        const medium =
+            Number(
+                data.medium_risk ??
+                data.medium ??
+                data.statistics?.medium_risk ??
+                0
+            );
+
+        const low =
+            Number(
+                data.low_risk ??
+                data.low ??
+                data.statistics?.low_risk ??
+                0
+            );
+
+
+        const donut =
+            document.getElementById("riskDonut");
+
+
+        if (total <= 0) {
+
+            donut.style.background =
+                "conic-gradient(#1e293b 0deg 360deg)";
+
+            return;
+
+        }
+
+
+        const lowDegrees =
+            (low / total) * 360;
+
+        const mediumDegrees =
+            (medium / total) * 360;
+
+        const mediumEnd =
+            lowDegrees + mediumDegrees;
+
+
+        donut.style.background =
+            `conic-gradient(
+                #22c55e 0deg ${lowDegrees}deg,
+                #f59e0b ${lowDegrees}deg ${mediumEnd}deg,
+                #ef4444 ${mediumEnd}deg 360deg
+            )`;
+
+    }
+
+
+    /* ================= RECENT PREDICTIONS ================= */
+
+    function updateRecentPredictions(data) {
+
+        const table =
+            document.getElementById("recentTable");
+
+
+        /*
+         * Different possible API property names are
+         * supported here.
+         */
+
+        const records =
+            data.recent_predictions ??
+            data.recent ??
+            data.predictions ??
+            [];
+
+
+        if (!Array.isArray(records) || records.length === 0) {
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-table">
+                        No predictions have been recorded yet.
+                    </td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+
+        table.innerHTML = records
+            .slice(0, 8)
+            .map(function(record) {
+
+                const patient =
+                    escapeHtml(
+                        record.patient_name ||
+                        record.name ||
+                        "Patient"
+                    );
+
+
+                const predictionId =
+                    escapeHtml(
+                        record.prediction_id ||
+                        record.id ||
+                        "—"
+                    );
+
+
+                const risk =
+                    record.risk_category ||
+                    record.risk ||
+                    "Unknown";
+
+
+                const score =
+                    record.risk_score ??
+                    record.score ??
+                    0;
+
+
+                const detection =
+                    record.detection_status ||
+                    record.detection ||
+                    "—";
+
+
+                const date =
+                    formatDate(
+                        record.created_at ||
+                        record.date ||
+                        record.timestamp
+                    );
+
+
+                const riskClass =
+                    getRiskClass(risk);
+
+
+                return `
+                    <tr>
+
+                        <td>
+                            <span class="patient-name">
+                                ${patient}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="prediction-id">
+                                ${predictionId}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="risk-badge ${riskClass}">
+                                ${escapeHtml(risk)}
+                            </span>
+                        </td>
+
+                        <td>
+                            ${formatScore(score)}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(detection)}
+                        </td>
+
+                        <td>
+                            ${date}
+                        </td>
+
+                    </tr>
+                `;
+
+            })
+            .join("");
+
+    }
+
+
+    /* ================= ACTIVITY CHART ================= */
+
+    function updateActivityChart(data) {
+
+        const chart = document.getElementById("activityChart");
+
+        let activity =
+            data.activity ??
+            data.daily_activity ??
+            data.chart_data ??
+            [];
+
+        if (!Array.isArray(activity)) {
+            activity = [];
+        }
+
+        /* Derive daily activity from saved prediction records when the
+           backend does not provide a dedicated activity series. */
+        if (activity.length === 0) {
+
+            const records =
+                data.recent_predictions ??
+                data.recent ??
+                data.predictions ??
+                [];
+
+            if (Array.isArray(records) && records.length > 0) {
+
+                const grouped = {};
+
+                records.forEach(function(record) {
+
+                    const rawDate =
+                        record.created_at ||
+                        record.date ||
+                        record.timestamp;
+
+                    if (!rawDate) return;
+
+                    const date = new Date(rawDate);
+                    if (Number.isNaN(date.getTime())) return;
+
+                    const key =
+                        date.getFullYear() + "-" +
+                        String(date.getMonth() + 1).padStart(2, "0") + "-" +
+                        String(date.getDate()).padStart(2, "0");
+
+                    if (!grouped[key]) {
+                        grouped[key] = 0;
+                    }
+
+                    grouped[key]++;
+                });
+
+                activity = Object.keys(grouped)
+                    .sort()
+                    .slice(-7)
+                    .map(function(key) {
+                        return {
+                            date: key,
+                            count: grouped[key]
+                        };
+                    });
+            }
+        }
+
+        if (activity.length === 0) {
+            chart.innerHTML = `
+                <div class="chart-grid-line grid-one"></div>
+                <div class="chart-grid-line grid-two"></div>
+                <div class="chart-grid-line grid-three"></div>
+                <div class="chart-grid-line grid-four"></div>
+                <div class="empty-chart">
+                    No prediction activity available yet.
+                </div>
+            `;
+            return;
+        }
+
+        const items = activity.slice(-7);
+
+        const values = items.map(function(item) {
+            return Number(
+                item.count ??
+                item.value ??
+                item.total ??
+                0
+            );
+        });
+
+        const max = Math.max(1, ...values);
+
+        chart.innerHTML = `
+            <div class="chart-grid-line grid-one"></div>
+            <div class="chart-grid-line grid-two"></div>
+            <div class="chart-grid-line grid-three"></div>
+            <div class="chart-grid-line grid-four"></div>
+            <svg class="activity-svg" viewBox="0 0 700 205" preserveAspectRatio="none" aria-label="Prediction activity chart"></svg>
+        `;
+
+        const svg = chart.querySelector(".activity-svg");
+        const width = 700;
+        const height = 205;
+        const left = 20;
+        const right = 680;
+        const top = 12;
+        const bottom = 175;
+        const step = items.length > 1 ? (right - left) / (items.length - 1) : 0;
+
+        const points = items.map(function(item, index) {
+            const value = values[index];
+            const x = items.length > 1 ? left + step * index : width / 2;
+            const y = bottom - ((value / max) * (bottom - top));
+            return { x, y, value, item };
+        });
+
+        const linePoints = points
+            .map(point => `${point.x},${point.y}`)
+            .join(" ");
+
+        const areaPoints =
+            `${left},${bottom} ${linePoints} ${right},${bottom}`;
+
+        let labels = "";
+        let pointsMarkup = "";
+
+        points.forEach(function(point) {
+
+            const rawLabel =
+                point.item.date ??
+                point.item.day ??
+                "";
+
+            let label = rawLabel;
+
+            const date = new Date(rawLabel);
+            if (!Number.isNaN(date.getTime())) {
+                label = date.toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short"
+                });
+            }
+
+            labels += `
+                <text class="activity-label" x="${point.x}" y="198">
+                    ${escapeHtml(String(label))}
+                </text>
+            `;
+
+            pointsMarkup += `
+                <circle class="activity-point" cx="${point.x}" cy="${point.y}" r="4"></circle>
+                <text class="activity-value" x="${point.x}" y="${Math.max(10, point.y - 9)}">
+                    ${point.value}
+                </text>
+            `;
+        });
+
+        svg.innerHTML = `
+            <polygon class="activity-fill" points="${areaPoints}"></polygon>
+            <polyline class="activity-line" points="${linePoints}"></polyline>
+            ${pointsMarkup}
+            ${labels}
+        `;
+    }
+
+    /* ================= HELPERS ================= */
+
+    function getRiskClass(risk) {
+
+        const value =
+            String(risk).toLowerCase();
+
+
+        if (value.includes("high")) {
+            return "risk-high";
+        }
+
+
+        if (value.includes("medium")) {
+            return "risk-medium";
+        }
+
+
+        if (value.includes("low")) {
+            return "risk-low";
+        }
+
+
+        return "risk-medium";
+
+    }
+
+
+    function formatScore(score) {
+
+        const numeric =
+            Number(score);
+
+
+        if (Number.isNaN(numeric)) {
+            return "—";
+        }
+
+
+        return numeric.toFixed(1) + "%";
+
+    }
+
+
+    function formatDate(value) {
+
+        if (!value) {
+            return "—";
+        }
+
+
+        const date =
+            new Date(value);
+
+
+        if (Number.isNaN(date.getTime())) {
+            return escapeHtml(String(value));
+        }
+
+
+        return date.toLocaleDateString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }
+        );
+
+    }
+
+
+    function formatShortDate(value) {
+
+        if (!value) {
+            return "—";
+        }
+
+
+        const date =
+            new Date(value);
+
+
+        if (Number.isNaN(date.getTime())) {
+            return String(value).slice(0, 8);
+        }
+
+
+        return date.toLocaleDateString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short"
+            }
+        );
+
+    }
+
+
+    /*
+     * Escape API text before putting it into HTML.
+     */
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+    }
+
+
+    function showDashboardError() {
+
+        document.getElementById(
+            "totalPredictions"
+        ).textContent = "—";
+
+        document.getElementById(
+            "highRisk"
+        ).textContent = "—";
+
+        document.getElementById(
+            "mediumRisk"
+        ).textContent = "—";
+
+        document.getElementById(
+            "lowRisk"
+        ).textContent = "—";
+
+
+        document.getElementById(
+            "recentTable"
+        ).innerHTML = `
+            <tr>
+                <td colspan="6" class="empty-table">
+                    Dashboard data could not be loaded.
+                    Please refresh the page.
+                </td>
+            </tr>
+        `;
+
+
+        document.getElementById(
+            "activityChart"
+        ).innerHTML = `
+            <div class="empty-chart">
+                Dashboard data unavailable.
+            </div>
+        `;
+
+    }
+
+
+    /* ================= INITIAL LOAD ================= */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function() {
+
+            loadDashboard();
+            loadHistoryAnalytics();
+
+        }
+    );
+
+</script>
+
+<!-- ===== PHASE 2 AI ASSISTANT ===== -->
+<button class="ai-fab" id="aiFab" type="button" aria-label="Open AI Assistant" onclick="toggleAIAssistant(true)">✦</button>
+<div class="ai-chat-panel" id="aiChatPanel" aria-hidden="true">
+  <div class="ai-chat-head"><div class="ai-chat-title"><div class="ai-chat-icon">✦</div><div><div class="ai-chat-name">Heart AI Assistant</div><div class="ai-chat-sub">Prediction-aware medical information</div></div></div><button class="ai-close" type="button" onclick="toggleAIAssistant(false)">×</button></div>
+  <div class="ai-chat-messages" id="aiMessages"><div class="ai-msg bot">Hello! I can explain your heart-risk result and clinical values in simple language. I provide educational information, not a medical diagnosis.</div></div>
+  <div class="ai-quick"><button type="button" onclick="askAI('Explain my result')">Explain my result</button><button type="button" onclick="askAI('Why is my risk category like this?')">Why this risk?</button><button type="button" onclick="askAI('Explain my clinical values')">Explain values</button><button type="button" onclick="askAI('What should I discuss with a doctor?')">Doctor discussion</button></div>
+  <form class="ai-chat-form" onsubmit="sendAIMessage(event)"><input class="ai-chat-input" id="aiInput" autocomplete="off" placeholder="Ask about your result..."/><button class="ai-send" type="submit">➤</button></form>
+</div>
+<script>
+
+    /*
+     * ============================================
+     * HEART AI DASHBOARD
+     * ============================================
+     *
+     * Data source:
+     *
+     *     /api/dashboard
+     *
+     * This page does not use hard-coded statistics.
+     * It reads the data saved by app.py in SQLite.
+     */
+
+
+    function openImageAnalyzer(event) {
+        if (event) event.preventDefault();
+        const modal = document.getElementById("medicalReportModal");
+        if (modal) modal.classList.add("active");
+    }
+
+    async function analyzeMedicalReport() {
+        const input = document.getElementById("medicalReportFile");
+        const button = document.getElementById("medicalAnalyzeButton");
+        const resultBox = document.getElementById("medicalReportResult");
+        const note = document.getElementById("medicalStepNote");
+
+        if (!input || !input.files || input.files.length === 0) {
+            if (note) note.textContent = "Please select a PDF, JPG, JPEG or PNG medical report first.";
+            return;
+        }
+
+        const file = input.files[0];
+        if (file.size > 10 * 1024 * 1024) {
+            if (note) note.textContent = "File is larger than 10 MB. Please choose a smaller report.";
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        button.disabled = true;
+        button.textContent = "Analyzing...";
+        if (note) note.textContent = "Uploading report, extracting text/OCR, and analyzing detected values...";
+        if (resultBox) resultBox.style.display = "none";
+
+        try {
+            const response = await fetch("/api/medical-report/upload", { method: "POST", body: formData });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.message || "Medical report analysis failed.");
+            renderMedicalReportResult(data);
+            if (note) note.textContent = "Analysis completed. Only values actually detected in the uploaded report are shown.";
+        } catch (error) {
+            if (note) note.textContent = error.message || "Unable to analyze the medical report.";
+        } finally {
+            button.disabled = false;
+            button.textContent = "Analyze Medical Report";
+        }
+    }
+
+    function medicalEscape(value) {
+        return String(value ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+    }
+
+    function renderMedicalReportResult(data) {
+        const resultBox = document.getElementById("medicalReportResult");
+        const valuesBox = document.getElementById("medicalValuesTable");
+        const meta = document.getElementById("medicalResultMeta");
+        const explanation = document.getElementById("medicalExplanation");
+        const observations = document.getElementById("medicalObservations");
+        const doctorPoints = document.getElementById("medicalDoctorPoints");
+        const disclaimer = document.getElementById("medicalDisclaimer");
+        const values = data.values || {};
+        const analysis = data.analysis || {};
+
+        meta.textContent = `${data.original_filename || "Report"} • ${data.extraction_method || "Extraction"} • Upload ID: ${data.upload_id || "—"}`;
+
+        let rows = `<table class="medical-values-table"><thead><tr><th>Parameter</th><th>Detected Value</th><th>Status</th><th>Reference</th></tr></thead><tbody>`;
+        Object.entries(values).forEach(([name,item]) => {
+            const statusClass = String(item.status || "Not Detected").toLowerCase().replaceAll(" ","-");
+            rows += `<tr><td>${medicalEscape(name)}</td><td>${medicalEscape(item.value)}</td><td class="medical-status-${statusClass}">${medicalEscape(item.status)}</td><td>${medicalEscape(item.reference_range)}</td></tr>`;
+        });
+        rows += `</tbody></table>`;
+        valuesBox.innerHTML = rows;
+
+        explanation.textContent = analysis.explanation || "No explanation available.";
+        observations.innerHTML = (analysis.observations || ["No observations detected."]).map(x => `<li>${medicalEscape(x)}</li>`).join("");
+        doctorPoints.innerHTML = (analysis.doctor_discussion || ["Discuss the report with a qualified healthcare professional."]).map(x => `<li>${medicalEscape(x)}</li>`).join("");
+        disclaimer.textContent = analysis.disclaimer || "AI-assisted screening/explanation only. This is not a medical diagnosis.";
+        resultBox.style.display = "block";
+    }
+
+
+    async function loadDashboard() {
+
+        const refreshButton =
+            document.getElementById("refreshButton");
+
+        refreshButton.textContent = "↻ Loading...";
+
+        try {
+
+            const response = await fetch("/api/dashboard", {
+                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    "Dashboard API returned " + response.status
+                );
+            }
+
+            const data = await response.json();
+
+            console.log("Dashboard data:", data);
+
+            updateStatistics(data);
+
+            updateRiskDistribution(data);
+
+            updateRecentPredictions(data);
+
+            updateActivityChart(data);
+
+        } catch (error) {
+
+            console.error(
+                "Dashboard loading error:",
+                error
+            );
+
+            showDashboardError();
+
+        } finally {
+
+            refreshButton.textContent = "↻ Refresh";
+
+        }
+
+    }
+
+
+    /* ================= STATISTICS ================= */
+
+    function updateStatistics(data) {
+
+        /*
+         * app.py returns dashboard statistics.
+         *
+         * We support both direct values and
+         * common nested structures so the
+         * frontend remains easy to extend.
+         */
+
+        const total =
+            Number(
+                data.total_predictions ??
+                data.total ??
+                data.statistics?.total_predictions ??
+                0
+            );
+
+        const high =
+            Number(
+                data.high_risk ??
+                data.high ??
+                data.statistics?.high_risk ??
+                0
+            );
+
+        const medium =
+            Number(
+                data.medium_risk ??
+                data.medium ??
+                data.statistics?.medium_risk ??
+                0
+            );
+
+        const low =
+            Number(
+                data.low_risk ??
+                data.low ??
+                data.statistics?.low_risk ??
+                0
+            );
+
+
+        document.getElementById(
+            "totalPredictions"
+        ).textContent = total;
+
+
+        document.getElementById(
+            "highRisk"
+        ).textContent = high;
+
+
+        document.getElementById(
+            "mediumRisk"
+        ).textContent = medium;
+
+
+        document.getElementById(
+            "lowRisk"
+        ).textContent = low;
+
+
+        document.getElementById(
+            "riskTotal"
+        ).textContent = total;
+
+
+        document.getElementById(
+            "lowRiskLegend"
+        ).textContent = low;
+
+
+        document.getElementById(
+            "mediumRiskLegend"
+        ).textContent = medium;
+
+
+        document.getElementById(
+            "highRiskLegend"
+        ).textContent = high;
+
+    }
+
+
+    /* ================= RISK DONUT ================= */
+
+    function updateRiskDistribution(data) {
+
+        const total =
+            Number(
+                data.total_predictions ??
+                data.total ??
+                data.statistics?.total_predictions ??
+                0
+            );
+
+        const high =
+            Number(
+                data.high_risk ??
+                data.high ??
+                data.statistics?.high_risk ??
+                0
+            );
+
+        const medium =
+            Number(
+                data.medium_risk ??
+                data.medium ??
+                data.statistics?.medium_risk ??
+                0
+            );
+
+        const low =
+            Number(
+                data.low_risk ??
+                data.low ??
+                data.statistics?.low_risk ??
+                0
+            );
+
+
+        const donut =
+            document.getElementById("riskDonut");
+
+
+        if (total <= 0) {
+
+            donut.style.background =
+                "conic-gradient(#1e293b 0deg 360deg)";
+
+            return;
+
+        }
+
+
+        const lowDegrees =
+            (low / total) * 360;
+
+        const mediumDegrees =
+            (medium / total) * 360;
+
+        const mediumEnd =
+            lowDegrees + mediumDegrees;
+
+
+        donut.style.background =
+            `conic-gradient(
+                #22c55e 0deg ${lowDegrees}deg,
+                #f59e0b ${lowDegrees}deg ${mediumEnd}deg,
+                #ef4444 ${mediumEnd}deg 360deg
+            )`;
+
+    }
+
+
+    /* ================= RECENT PREDICTIONS ================= */
+
+    function updateRecentPredictions(data) {
+
+        const table =
+            document.getElementById("recentTable");
+
+
+        /*
+         * Different possible API property names are
+         * supported here.
+         */
+
+        const records =
+            data.recent_predictions ??
+            data.recent ??
+            data.predictions ??
+            [];
+
+
+        if (!Array.isArray(records) || records.length === 0) {
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-table">
+                        No predictions have been recorded yet.
+                    </td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+
+        table.innerHTML = records
+            .slice(0, 8)
+            .map(function(record) {
+
+                const patient =
+                    escapeHtml(
+                        record.patient_name ||
+                        record.name ||
+                        "Patient"
+                    );
+
+
+                const predictionId =
+                    escapeHtml(
+                        record.prediction_id ||
+                        record.id ||
+                        "—"
+                    );
+
+
+                const risk =
+                    record.risk_category ||
+                    record.risk ||
+                    "Unknown";
+
+
+                const score =
+                    record.risk_score ??
+                    record.score ??
+                    0;
+
+
+                const detection =
+                    record.detection_status ||
+                    record.detection ||
+                    "—";
+
+
+                const date =
+                    formatDate(
+                        record.created_at ||
+                        record.date ||
+                        record.timestamp
+                    );
+
+
+                const riskClass =
+                    getRiskClass(risk);
+
+
+                return `
+                    <tr>
+
+                        <td>
+                            <span class="patient-name">
+                                ${patient}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="prediction-id">
+                                ${predictionId}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="risk-badge ${riskClass}">
+                                ${escapeHtml(risk)}
+                            </span>
+                        </td>
+
+                        <td>
+                            ${formatScore(score)}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(detection)}
+                        </td>
+
+                        <td>
+                            ${date}
+                        </td>
+
+                    </tr>
+                `;
+
+            })
+            .join("");
+
+    }
+
+
+    /* ================= ACTIVITY CHART ================= */
+
+    function updateActivityChart(data) {
+
+        const chart = document.getElementById("activityChart");
+
+        let activity =
+            data.activity ??
+            data.daily_activity ??
+            data.chart_data ??
+            [];
+
+        if (!Array.isArray(activity)) {
+            activity = [];
+        }
+
+        /* Derive daily activity from saved prediction records when the
+           backend does not provide a dedicated activity series. */
+        if (activity.length === 0) {
+
+            const records =
+                data.recent_predictions ??
+                data.recent ??
+                data.predictions ??
+                [];
+
+            if (Array.isArray(records) && records.length > 0) {
+
+                const grouped = {};
+
+                records.forEach(function(record) {
+
+                    const rawDate =
+                        record.created_at ||
+                        record.date ||
+                        record.timestamp;
+
+                    if (!rawDate) return;
+
+                    const date = new Date(rawDate);
+                    if (Number.isNaN(date.getTime())) return;
+
+                    const key =
+                        date.getFullYear() + "-" +
+                        String(date.getMonth() + 1).padStart(2, "0") + "-" +
+                        String(date.getDate()).padStart(2, "0");
+
+                    if (!grouped[key]) {
+                        grouped[key] = 0;
+                    }
+
+                    grouped[key]++;
+                });
+
+                activity = Object.keys(grouped)
+                    .sort()
+                    .slice(-7)
+                    .map(function(key) {
+                        return {
+                            date: key,
+                            count: grouped[key]
+                        };
+                    });
+            }
+        }
+
+        if (activity.length === 0) {
+            chart.innerHTML = `
+                <div class="chart-grid-line grid-one"></div>
+                <div class="chart-grid-line grid-two"></div>
+                <div class="chart-grid-line grid-three"></div>
+                <div class="chart-grid-line grid-four"></div>
+                <div class="empty-chart">
+                    No prediction activity available yet.
+                </div>
+            `;
+            return;
+        }
+
+        const items = activity.slice(-7);
+
+        const values = items.map(function(item) {
+            return Number(
+                item.count ??
+                item.value ??
+                item.total ??
+                0
+            );
+        });
+
+        const max = Math.max(1, ...values);
+
+        chart.innerHTML = `
+            <div class="chart-grid-line grid-one"></div>
+            <div class="chart-grid-line grid-two"></div>
+            <div class="chart-grid-line grid-three"></div>
+            <div class="chart-grid-line grid-four"></div>
+            <svg class="activity-svg" viewBox="0 0 700 205" preserveAspectRatio="none" aria-label="Prediction activity chart"></svg>
+        `;
+
+        const svg = chart.querySelector(".activity-svg");
+        const width = 700;
+        const height = 205;
+        const left = 20;
+        const right = 680;
+        const top = 12;
+        const bottom = 175;
+        const step = items.length > 1 ? (right - left) / (items.length - 1) : 0;
+
+        const points = items.map(function(item, index) {
+            const value = values[index];
+            const x = items.length > 1 ? left + step * index : width / 2;
+            const y = bottom - ((value / max) * (bottom - top));
+            return { x, y, value, item };
+        });
+
+        const linePoints = points
+            .map(point => `${point.x},${point.y}`)
+            .join(" ");
+
+        const areaPoints =
+            `${left},${bottom} ${linePoints} ${right},${bottom}`;
+
+        let labels = "";
+        let pointsMarkup = "";
+
+        points.forEach(function(point) {
+
+            const rawLabel =
+                point.item.date ??
+                point.item.day ??
+                "";
+
+            let label = rawLabel;
+
+            const date = new Date(rawLabel);
+            if (!Number.isNaN(date.getTime())) {
+                label = date.toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short"
+                });
+            }
+
+            labels += `
+                <text class="activity-label" x="${point.x}" y="198">
+                    ${escapeHtml(String(label))}
+                </text>
+            `;
+
+            pointsMarkup += `
+                <circle class="activity-point" cx="${point.x}" cy="${point.y}" r="4"></circle>
+                <text class="activity-value" x="${point.x}" y="${Math.max(10, point.y - 9)}">
+                    ${point.value}
+                </text>
+            `;
+        });
+
+        svg.innerHTML = `
+            <polygon class="activity-fill" points="${areaPoints}"></polygon>
+            <polyline class="activity-line" points="${linePoints}"></polyline>
+            ${pointsMarkup}
+            ${labels}
+        `;
+    }
+
+    /* ================= HELPERS ================= */
+
+    function getRiskClass(risk) {
+
+        const value =
+            String(risk).toLowerCase();
+
+
+        if (value.includes("high")) {
+            return "risk-high";
+        }
+
+
+        if (value.includes("medium")) {
+            return "risk-medium";
+        }
+
+
+        if (value.includes("low")) {
+            return "risk-low";
+        }
+
+
+        return "risk-medium";
+
+    }
+
+
+    function formatScore(score) {
+
+        const numeric =
+            Number(score);
+
+
+        if (Number.isNaN(numeric)) {
+            return "—";
+        }
+
+
+        return numeric.toFixed(1) + "%";
+
+    }
+
+
+    function formatDate(value) {
+
+        if (!value) {
+            return "—";
+        }
+
+
+        const date =
+            new Date(value);
+
+
+        if (Number.isNaN(date.getTime())) {
+            return escapeHtml(String(value));
+        }
+
+
+        return date.toLocaleDateString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }
+        );
+
+    }
+
+
+    function formatShortDate(value) {
+
+        if (!value) {
+            return "—";
+        }
+
+
+        const date =
+            new Date(value);
+
+
+        if (Number.isNaN(date.getTime())) {
+            return String(value).slice(0, 8);
+        }
+
+
+        return date.toLocaleDateString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short"
+            }
+        );
+
+    }
+
+
+    /*
+     * Escape API text before putting it into HTML.
+     */
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+    }
+
+
+    function showDashboardError() {
+
+        document.getElementById(
+            "totalPredictions"
+        ).textContent = "—";
+
+        document.getElementById(
+            "highRisk"
+        ).textContent = "—";
+
+        document.getElementById(
+            "mediumRisk"
+        ).textContent = "—";
+
+        document.getElementById(
+            "lowRisk"
+        ).textContent = "—";
+
+
+        document.getElementById(
+            "recentTable"
+        ).innerHTML = `
+            <tr>
+                <td colspan="6" class="empty-table">
+                    Dashboard data could not be loaded.
+                    Please refresh the page.
+                </td>
+            </tr>
+        `;
+
+
+        document.getElementById(
+            "activityChart"
+        ).innerHTML = `
+            <div class="empty-chart">
+                Dashboard data unavailable.
+            </div>
+        `;
+
+    }
+
+
+    /* ================= INITIAL LOAD ================= */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function() {
+
+            loadDashboard();
+
+        }
+    );
+
+</script>
+
+
+<script>
+let aiBusy=false;
+function toggleAIAssistant(open){const p=document.getElementById('aiChatPanel'),f=document.getElementById('aiFab');if(!p)return;p.classList.toggle('open',open);p.setAttribute('aria-hidden',String(!open));f.classList.toggle('hidden',open);if(open)setTimeout(()=>document.getElementById('aiInput')?.focus(),80)}
+function addAIMessage(text,type='bot'){const box=document.getElementById('aiMessages');const el=document.createElement('div');el.className='ai-msg '+type;el.textContent=text;box.appendChild(el);box.scrollTop=box.scrollHeight;return el}
+function askAI(text){document.getElementById('aiInput').value=text;sendAIMessage(new Event('submit',{cancelable:true}))}
+async function sendAIMessage(e){e.preventDefault();if(aiBusy)return;const input=document.getElementById('aiInput'),q=input.value.trim();if(!q)return;input.value='';addAIMessage(q,'user');const typing=addAIMessage('Thinking...','bot ai-typing');aiBusy=true;try{const response=await fetch('/api/assistant',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q})});const data=await response.json();typing.remove();addAIMessage(data.answer||data.response||data.message||data.error||'I could not generate a response right now.','bot')}catch(err){typing.remove();addAIMessage('Assistant is temporarily unavailable. Please try again.','bot')}finally{aiBusy=false}}
+</script>
+
+</body>
+</html>

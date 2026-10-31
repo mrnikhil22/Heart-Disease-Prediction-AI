@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>History & Analytics | Heart AI</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#020817;color:#e8eef8}a{color:#7dd3fc}.wrap{max-width:1280px;margin:0 auto;padding:32px 22px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:28px}.title h1{margin:0;font-size:30px}.title p{margin:7px 0 0;color:#8fa3bd}.actions{display:flex;gap:10px}.btn{display:inline-block;padding:11px 15px;border:1px solid #1e3a56;border-radius:10px;text-decoration:none;color:#dce8f7;background:#0b1728}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}.card{background:#0a1727;border:1px solid #16304a;border-radius:16px;padding:20px}.label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#7890aa}.value{font-size:27px;font-weight:700;margin-top:8px}.panel{background:#071525;border:1px solid #16304a;border-radius:18px;padding:22px;margin-bottom:22px}.panel h2{margin:0}.sub{color:#8fa3bd;font-size:13px;margin:6px 0 18px}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:900px}th,td{text-align:left;padding:13px 12px;border-bottom:1px solid #173047;font-size:13px}th{color:#7890aa;font-size:11px;text-transform:uppercase;letter-spacing:.07em}.badge{display:inline-block;padding:5px 9px;border-radius:999px;font-size:11px}.high{background:#3a1720;color:#ff8c9c}.medium{background:#3a2e12;color:#ffd66b}.low{background:#123226;color:#71f0bd}.normal{color:#71f0bd}.muted{color:#8fa3bd}.empty{padding:25px;color:#8fa3bd}.two{display:grid;grid-template-columns:1fr 1fr;gap:22px}.list{margin:0;padding-left:20px;color:#b8c7d9}.list li{margin:9px 0}@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}@media(max-width:560px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+
+<!-- ===== PHASE 7 AUTH ADDITION (ONLY ADDITION) ===== -->
+<div class="phase7-auth-bar" style="display:flex;gap:10px;align-items:center;justify-content:flex-end;margin:10px 0;padding:10px;border-radius:10px;background:#0f172a;border:1px solid #334155;position:relative;z-index:20;">
+    <span>{{ session.get('full_name', 'User') }} · {{ session.get('role', 'USER') }}</span>
+    {% if session.get('role') == 'ADMIN' %}<a href="{{ url_for('admin_dashboard') }}">Admin Panel</a>{% elif session.get('role') == 'DOCTOR' %}<a href="{{ url_for('doctor_dashboard') }}">Doctor Panel</a>{% else %}<a href="{{ url_for('dashboard') }}">Dashboard</a>{% endif %}
+    <a href="{{ url_for('logout') }}">Logout</a>
+</div>
+
+<div class="wrap">
+  <div class="top">
+    <div class="title"><h1>History &amp; Analytics</h1><p>Prediction history, patient activity and medical report records.</p></div>
+    <div class="actions"><a class="btn" href="/dashboard">← Dashboard</a><a class="btn" href="/prediction">+ New Prediction</a></div>
+  </div>
+  <div class="grid">
+    <div class="card"><div class="label">Total Patients</div><div class="value" id="patients">—</div></div>
+    <div class="card"><div class="label">Total Predictions</div><div class="value" id="predictions">—</div></div>
+    <div class="card"><div class="label">Average Risk Score</div><div class="value" id="avgRisk">—</div></div>
+    <div class="card"><div class="label">Medical Reports</div><div class="value" id="reports">—</div></div>
+  </div>
+  <div class="two">
+    <section class="panel"><h2>Risk Distribution</h2><div class="sub">Saved prediction records.</div><ul class="list" id="riskList"><li>Loading...</li></ul></section>
+    <section class="panel"><h2>Prediction Trend</h2><div class="sub">Date, prediction count and average risk score.</div><div id="trend" class="muted">Loading...</div></section>
+  </div>
+  <section class="panel">
+    <h2>Prediction History</h2><div class="sub">Latest saved heart-disease prediction records.</div>
+    <div class="table-wrap"><table><thead><tr><th>Patient</th><th>Prediction ID</th><th>Risk</th><th>Score</th><th>Detection</th><th>Date</th></tr></thead><tbody id="predictionRows"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody></table></div>
+  </section>
+  <section class="panel">
+    <h2>Medical Report History</h2><div class="sub">Reports processed by the Medical Report Analyzer.</div>
+    <div class="table-wrap"><table><thead><tr><th>Upload ID</th><th>File</th><th>Type</th><th>Extraction</th><th>OCR</th><th>Detected</th><th>Date</th></tr></thead><tbody id="reportRows"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody></table></div>
+  </section>
+</div>
+<script>
+function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;')}
+function badge(v){const s=String(v||'').toLowerCase();const c=s.includes('high')?'high':s.includes('medium')?'medium':s.includes('low')?'low':'muted';return `<span class="badge ${c}">${esc(v||'—')}</span>`}
+async function load(){
+ try{
+  const [a,p,r]=await Promise.all([fetch('/api/history-analytics',{cache:'no-store'}),fetch('/api/history-data',{cache:'no-store'}),fetch('/api/medical-report/history',{cache:'no-store'})]);
+  const ad=await a.json(), pd=await p.json(), rd=await r.json();
+  document.getElementById('patients').textContent=ad.total_patients??0;document.getElementById('predictions').textContent=ad.total_predictions??0;document.getElementById('avgRisk').textContent=Number(ad.average_risk_score||0).toFixed(1)+'%';document.getElementById('reports').textContent=ad.total_medical_reports??0;
+  const rc=ad.risk_counts||{};document.getElementById('riskList').innerHTML=`<li>High Risk: <b>${Number(rc.high_risk||0)}</b></li><li>Medium Risk: <b>${Number(rc.medium_risk||0)}</b></li><li>Low Risk: <b>${Number(rc.low_risk||0)}</b></li>`;
+  const trends=ad.prediction_trend||[];document.getElementById('trend').innerHTML=trends.length?trends.map(x=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #173047"><span>${esc(x.date)}</span><span>${Number(x.count||0)} prediction(s) · ${Number(x.avg_risk||0).toFixed(1)}%</span></div>`).join(''):'No prediction history yet.';
+  const preds=pd.predictions||[];document.getElementById('predictionRows').innerHTML=preds.length?preds.map(x=>`<tr><td>${esc(x.patient_name||x.patient_id||'—')}</td><td>${esc(x.prediction_id)}</td><td>${badge(x.risk_category)}</td><td>${Number(x.risk_score||0).toFixed(1)}%</td><td>${esc(x.detection_status||'—')}</td><td>${esc(x.created_at||'—')}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">No prediction history yet.</td></tr>';
+  const reports=rd.reports||[];document.getElementById('reportRows').innerHTML=reports.length?reports.map(x=>`<tr><td>${esc(x.upload_id)}</td><td>${esc(x.original_filename)}</td><td>${esc((x.file_type||'').toUpperCase())}</td><td>${esc(x.extraction_method||'—')}</td><td>${x.ocr_used?'Yes':'No'}</td><td>${Number(x.analysis?.detected_count||0)}/${Number(x.analysis?.total_supported_values||0)}</td><td>${esc(x.created_at||'—')}</td></tr>`).join(''):'<tr><td colspan="7" class="empty">No medical reports have been analyzed yet.</td></tr>';
+ }catch(e){console.error(e);document.getElementById('predictionRows').innerHTML='<tr><td colspan="6" class="empty">Unable to load history. Please refresh.</td></tr>'}
+}
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Patient Check | HEART AI</title>
+<style>
+body{margin:0;background:#07111f;color:#e5eefb;font-family:Arial,sans-serif;padding:32px}
+.wrap{max-width:1100px;margin:auto}.card{background:#0d1c2e;border:1px solid #20334b;border-radius:18px;padding:24px;margin-bottom:20px}
+h1,h2{margin-top:0}.muted{color:#94a3b8}.row{display:flex;gap:12px;flex-wrap:wrap}
+input,button{padding:12px 14px;border-radius:10px;border:1px solid #334155;background:#081525;color:#fff}
+input{flex:1;min-width:240px}button{background:#0f766e;cursor:pointer}
+table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #20334b;text-align:left;font-size:14px}
+.badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#15304a}.error{color:#fca5a5}
+a{color:#67e8f9;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<a href="{{ url_for('doctor_dashboard') }}">← Doctor Dashboard</a>
+<h1>Check Patient</h1>
+<p class="muted">Enter a Patient ID. Every successful check is automatically saved in your Doctor Activity History.</p>
+<form method="POST" class="row">
+<input name="patient_id" placeholder="PAT-XXXXXX" value="{{ searched_patient_id }}">
+<button type="submit">Check Patient</button>
+<a href="{{ url_for('doctor_history') }}">My Activity History</a>
+</form>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+</div>
+
+{% if patient %}
+<div class="card">
+<h2>{{ patient.patient_name }}</h2>
+<p class="muted">Patient ID: <span class="badge">{{ patient.patient_id }}</span></p>
+<p>Created: {{ patient.created_at }} &nbsp; | &nbsp; Updated: {{ patient.updated_at }}</p>
+</div>
+
+<div class="card">
+<h2>Prediction History</h2>
+{% if predictions %}
+<table><tr><th>Date</th><th>Prediction ID</th><th>Risk</th><th>Probability</th><th>Detection</th></tr>
+{% for p in predictions %}
+<tr><td>{{ p.created_at }}</td><td>{{ p.prediction_id }}</td><td>{{ p.risk_category }}</td><td>{{ p.probability }}</td><td>{{ p.detection_status }}</td></tr>
+{% endfor %}</table>
+{% else %}<p class="muted">No predictions found.</p>{% endif %}
+</div>
+
+<div class="card">
+<h2>Medical Report History</h2>
+{% if reports %}
+<table><tr><th>Date</th><th>Report</th><th>Upload ID</th><th>Method</th></tr>
+{% for r in reports %}
+<tr><td>{{ r.created_at }}</td><td>{{ r.original_filename }}</td><td>{{ r.upload_id }}</td><td>{{ r.extraction_method or "N/A" }}</td></tr>
+{% endfor %}</table>
+{% else %}<p class="muted">No medical reports found.</p>{% endif %}
+</div>
+{% endif %}
+</div>
+</body>
+</html>

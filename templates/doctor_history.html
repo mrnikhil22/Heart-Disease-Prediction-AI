@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Activity History | HEART AI</title>
+<style>
+body{margin:0;background:#07111f;color:#e5eefb;font-family:Arial,sans-serif;padding:32px}.wrap{max-width:1150px;margin:auto}
+.card{background:#0d1c2e;border:1px solid #20334b;border-radius:18px;padding:24px}.muted{color:#94a3b8}
+a{color:#67e8f9;text-decoration:none}table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{padding:11px;border-bottom:1px solid #20334b;text-align:left;font-size:14px}
+</style>
+</head>
+<body><div class="wrap"><div class="card">
+<a href="{{ url_for('doctor_dashboard') }}">← Doctor Dashboard</a>
+<h1>My Patient Activity History</h1>
+<p class="muted">Only activity performed by your doctor account is shown here.</p>
+{% if activities %}
+<table><tr><th>Date & Time</th><th>Patient</th><th>Patient ID</th><th>Action</th><th>Details</th></tr>
+{% for a in activities %}
+<tr><td>{{ a.created_at }}</td><td>{{ a.patient_name or "Unknown" }}</td><td>{{ a.patient_id }}</td><td>{{ a.action }}</td><td>{{ a.details }}</td></tr>
+{% endfor %}</table>
+{% else %}<p class="muted">No patient activity recorded yet.</p>{% endif %}
+</div></div></body></html>

@@ -8,3 +8,11 @@ matplotlib==3.7.2
 reportlab==4.0.8
 gunicorn==20.1.0
 setuptools==65.5.0
+
+pdfplumber
+pytesseract
+Pillow
+werkzeug
+
+
+shap==0.44.1

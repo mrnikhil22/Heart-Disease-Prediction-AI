@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Patient Record | HEART AI</title>
+<style>
+body{margin:0;background:#07111f;color:#e5eefb;font-family:Arial,sans-serif;padding:32px}.wrap{max-width:1200px;margin:auto}
+.card{background:#0d1c2e;border:1px solid #20334b;border-radius:18px;padding:24px;margin-bottom:20px}
+a{color:#67e8f9;text-decoration:none}.muted{color:#94a3b8}table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid #20334b;text-align:left;font-size:13px}
+</style></head><body><div class="wrap">
+<div class="card"><a href="{{ url_for('admin_patients') }}">← All Patients</a>
+<h1>{{ patient.patient_name }}</h1><p class="muted">Patient ID: {{ patient.patient_id }}</p></div>
+<div class="card"><h2>Prediction History</h2>
+{% if predictions %}<table><tr><th>Date</th><th>ID</th><th>Risk</th><th>Probability</th><th>Detection</th></tr>
+{% for p in predictions %}<tr><td>{{ p.created_at }}</td><td>{{ p.prediction_id }}</td><td>{{ p.risk_category }}</td><td>{{ p.probability }}</td><td>{{ p.detection_status }}</td></tr>{% endfor %}</table>
+{% else %}<p class="muted">No predictions.</p>{% endif %}</div>
+<div class="card"><h2>Medical Reports</h2>
+{% if reports %}<table><tr><th>Date</th><th>Filename</th><th>Upload ID</th><th>Method</th></tr>
+{% for r in reports %}<tr><td>{{ r.created_at }}</td><td>{{ r.original_filename }}</td><td>{{ r.upload_id }}</td><td>{{ r.extraction_method or "N/A" }}</td></tr>{% endfor %}</table>
+{% else %}<p class="muted">No reports.</p>{% endif %}</div>
+<div class="card"><h2>Doctor Access History</h2>
+{% if doctor_activity %}<table><tr><th>Date</th><th>Doctor</th><th>Email</th><th>Action</th><th>Details</th></tr>
+{% for a in doctor_activity %}<tr><td>{{ a.created_at }}</td><td>{{ a.doctor_name or "Unknown" }}</td><td>{{ a.doctor_email or "—" }}</td><td>{{ a.action }}</td><td>{{ a.details }}</td></tr>{% endfor %}</table>
+{% else %}<p class="muted">No doctor access has been recorded.</p>{% endif %}</div>
+</div></body></html>

@@ -1,131 +1,721 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Prediction Result</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>HeartAI | Prediction Result</title>
 
-<style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #0f2027, #2c5364);
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-}
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-/* Glass Card */
-.card {
-    width: 420px;
-    padding: 35px;
-    border-radius: 20px;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(15px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-    text-align: center;
-    animation: fadeIn 0.8s ease-in-out;
-}
+        body {
+            min-height: 100vh;
+            font-family: "Inter", sans-serif;
+            color: #f5f7fa;
 
-/* Animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px);}
-    to { opacity: 1; transform: translateY(0);}
-}
+            background:
+                radial-gradient(circle at 15% 10%, rgba(255, 65, 108, 0.13), transparent 30%),
+                radial-gradient(circle at 90% 90%, rgba(255, 75, 43, 0.10), transparent 30%),
+                linear-gradient(135deg, #071a22, #0b2630);
 
-h2 {
-    margin-bottom: 20px;
-}
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-/* Risk Badge */
-.badge {
-    padding: 10px 20px;
-    border-radius: 50px;
-    font-size: 20px;
-    font-weight: bold;
-    display: inline-block;
-    margin-bottom: 15px;
-}
+            padding: 25px;
+        }
 
-.low { background: #00c853; }
-.medium { background: #ffab00; }
-.high { background: #d50000; }
+        .result-card {
+            width: min(720px, 100%);
 
-/* Info Box */
-.info {
-    margin: 10px 0;
-    font-size: 16px;
-}
+            padding: 45px 40px;
 
-/* Button */
-button {
-    margin-top: 15px;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 30px;
-    background: linear-gradient(45deg, #ff416c, #ff4b2b);
-    color: white;
-    font-size: 15px;
-    cursor: pointer;
-    transition: 0.3s;
-}
+            border-radius: 28px;
 
-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-}
+            background: linear-gradient(
+                145deg,
+                rgba(35, 65, 76, 0.95),
+                rgba(13, 36, 46, 0.95)
+            );
 
-/* Back Link */
-a {
-    display: inline-block;
-    margin-top: 20px;
-    color: #ddd;
-    text-decoration: none;
-}
+            border: 1px solid rgba(255,255,255,0.10);
 
-a:hover {
-    color: white;
-}
+            box-shadow:
+                0 30px 80px rgba(0,0,0,0.38);
 
-</style>
+            backdrop-filter: blur(20px);
+
+            text-align: center;
+
+            animation: cardIn 0.6s ease;
+        }
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .heart-icon {
+            font-size: 43px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-family: "Poppins", sans-serif;
+            font-size: clamp(25px, 5vw, 37px);
+            margin-bottom: 32px;
+        }
+
+        .result-label {
+            color: #91a5ad;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+        }
+
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 190px;
+
+            padding: 13px 25px;
+
+            border-radius: 50px;
+
+            font-family: "Poppins", sans-serif;
+            font-size: 21px;
+            font-weight: 700;
+
+            margin-bottom: 30px;
+        }
+
+        .low {
+            background: rgba(53, 211, 154, 0.14);
+            color: #51e0ad;
+            border: 1px solid rgba(53, 211, 154, 0.25);
+        }
+
+        .medium {
+            background: rgba(255, 180, 50, 0.14);
+            color: #ffc45c;
+            border: 1px solid rgba(255, 180, 50, 0.25);
+        }
+
+        .high {
+            background: rgba(255, 65, 108, 0.14);
+            color: #ff718c;
+            border: 1px solid rgba(255, 65, 108, 0.25);
+        }
+
+        .patient-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: -8px 0 22px;
+            text-align: left;
+        }
+
+        .patient-meta-item {
+            padding: 13px 15px;
+            border-radius: 13px;
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .patient-meta-label {
+            display: block;
+            color: #7f949d;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .patient-meta-value {
+            display: block;
+            color: #f1f5f7;
+            font-size: 13px;
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+
+            gap: 15px;
+
+            margin-bottom: 30px;
+        }
+
+        .metric {
+            padding: 22px 15px;
+
+            border-radius: 17px;
+
+            background: rgba(255,255,255,0.045);
+
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .metric-title {
+            color: #8fa2aa;
+            font-size: 12px;
+            margin-bottom: 9px;
+        }
+
+        .metric-value {
+            font-family: "Poppins", sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .report-button {
+            width: 100%;
+            height: 56px;
+
+            border: none;
+            border-radius: 15px;
+
+            color: white;
+
+            background: linear-gradient(
+                110deg,
+                #ff416c,
+                #ff4b2b
+            );
+
+            font-family: "Poppins", sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 12px 30px rgba(255,65,108,0.25);
+
+            transition: 0.25s ease;
+        }
+
+        .report-button:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 17px 35px rgba(255,65,108,0.34);
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-top: 22px;
+
+            padding: 12px 20px;
+
+            border-radius: 12px;
+
+            color: #b9c7cc;
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            background: rgba(255,255,255,0.035);
+
+            border: 1px solid rgba(255,255,255,0.07);
+
+            transition: 0.25s ease;
+        }
+
+        .back-button:hover {
+            color: white;
+            background: rgba(255,255,255,0.07);
+            transform: translateY(-1px);
+        }
+
+
+        .xai-panel { margin: 24px 0 14px; padding: 22px; text-align:left; border-radius:18px; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.08); }
+        .xai-panel h3 { margin-bottom:8px; font-family:"Poppins",sans-serif; }
+        .xai-method { color:#91a5ad; font-size:11px; margin-bottom:12px; }
+        .xai-summary { color:#c8d3d7; font-size:12px; line-height:1.6; margin-bottom:15px; }
+        .xai-row { display:flex; justify-content:space-between; gap:12px; padding:10px 12px; margin:7px 0; border-radius:10px; background:rgba(0,0,0,.12); font-size:12px; }
+        .xai-feature { font-weight:700; }
+        .xai-up { color:#ff8da2; } .xai-down { color:#6ee7c1; } .xai-neutral { color:#b8c5ca; }
+        .xai-note { margin-top:12px; color:#738890; font-size:10px; line-height:1.55; }
+
+        .disclaimer {
+            margin-top: 25px;
+
+            color: #738890;
+
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        .error {
+            color: #ff718c;
+            font-size: 17px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 600px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .result-card {
+                padding: 32px 20px;
+            }
+
+            .patient-meta {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 27px;
+            }
+        }
+    
+        .ai-result-actions {
+            margin: 22px 0 14px;
+            text-align: center;
+        }
+
+        .ai-result-button {
+            border: 1px solid rgba(236, 72, 153, 0.45);
+            background: linear-gradient(135deg, #ef4444, #ec4899);
+            color: #fff;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(236, 72, 153, 0.22);
+        }
+
+        .result-ai-panel {
+            margin: 14px 0 22px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.72);
+            overflow: hidden;
+            text-align: left;
+        }
+
+        .result-ai-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+        }
+
+        .result-ai-header small {
+            display: block;
+            margin-top: 3px;
+            opacity: .65;
+        }
+
+        .result-ai-close {
+            border: 0;
+            background: transparent;
+            color: inherit;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .result-ai-quick {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px 16px;
+        }
+
+        .result-ai-quick button {
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            background: rgba(30, 41, 59, 0.65);
+            color: inherit;
+            border-radius: 9px;
+            padding: 7px 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .result-ai-messages {
+            max-height: 280px;
+            overflow-y: auto;
+            padding: 0 16px 12px;
+        }
+
+        .result-ai-message {
+            padding: 10px 12px;
+            margin: 8px 0;
+            border-radius: 10px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .result-ai-message.assistant {
+            background: rgba(30, 41, 59, 0.7);
+        }
+
+        .result-ai-message.user {
+            background: rgba(236, 72, 153, 0.16);
+        }
+
+        .result-ai-input-row {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px 16px;
+        }
+
+        .result-ai-input-row input {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            background: rgba(2, 6, 23, 0.55);
+            color: inherit;
+            border-radius: 10px;
+            padding: 11px 12px;
+        }
+
+        .result-ai-input-row button {
+            border: 0;
+            border-radius: 10px;
+            padding: 0 16px;
+            background: #ec4899;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .result-ai-input-row {
+                flex-direction: column;
+            }
+            .result-ai-input-row button {
+                min-height: 42px;
+            }
+        }
+
+    </style>
 </head>
 
 <body>
 
-<div class="card">
-
-<h2>❤️ Heart Disease Prediction</h2>
-
-<!-- ERROR -->
-{% if error %}
-    <h3 style="color:#ff4b2b;">{{ error }}</h3>
-
-{% else %}
-
-<!-- RESULT -->
-<div class="badge {{ category|lower|replace(' ', '') }}">
-    {{ category }}
+<!-- ===== PHASE 7 AUTH ADDITION (ONLY ADDITION) ===== -->
+<div class="phase7-auth-bar" style="display:flex;gap:10px;align-items:center;justify-content:flex-end;margin:10px 0;padding:10px;border-radius:10px;background:#0f172a;border:1px solid #334155;position:relative;z-index:20;">
+    <span>{{ session.get('full_name', 'User') }} · {{ session.get('role', 'USER') }}</span>
+    {% if session.get('role') == 'ADMIN' %}<a href="{{ url_for('admin_dashboard') }}">Admin Panel</a>{% elif session.get('role') == 'DOCTOR' %}<a href="{{ url_for('doctor_dashboard') }}">Doctor Panel</a>{% else %}<a href="{{ url_for('dashboard') }}">Dashboard</a>{% endif %}
+    <a href="{{ url_for('logout') }}">Logout</a>
 </div>
 
-<div class="info"><b>Risk Score:</b> {{ risk_score }}%</div>
-<div class="info"><b>Probability:</b> {{ probability }}</div>
 
-<!-- REPORT BUTTON -->
-<form action="/report" method="POST">
-    <input type="hidden" name="risk_score" value="{{ risk_score }}">
-    <input type="hidden" name="category" value="{{ category }}">
-    <input type="hidden" name="probability" value="{{ probability }}">
-    <button>📄 Download Report</button>
-</form>
+<div class="result-card">
 
-{% endif %}
+    <div class="heart-icon">
+        ❤️
+    </div>
 
-<a href="/">⬅ Back to Home</a>
+    <h1>
+        Heart Disease Prediction
+    </h1>
+
+
+    {% if error %}
+
+        <div class="error">
+            {{ error }}
+        </div>
+
+    {% else %}
+
+        <div class="result-label">
+            AI Analysis Result
+        </div>
+
+
+        <div class="risk-badge {{ category|lower|replace(' ', '') }}">
+            {{ category }}
+        </div>
+
+
+        <div class="patient-meta">
+
+            <div class="patient-meta-item">
+
+                <span class="patient-meta-label">
+                    Patient Name
+                </span>
+
+                <span class="patient-meta-value">
+                    {{ patient_name or "Not provided" }}
+                </span>
+
+            </div>
+
+
+            <div class="patient-meta-item">
+
+                <span class="patient-meta-label">
+                    Patient ID
+                </span>
+
+                <span class="patient-meta-value">
+                    {{ patient_id or "Not assigned" }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="metrics">
+
+            <div class="metric">
+
+                <div class="metric-title">
+                    Risk Score
+                </div>
+
+                <div class="metric-value">
+                    {{ risk_score }}%
+                </div>
+
+            </div>
+
+
+            <div class="metric">
+
+                <div class="metric-title">
+                    Model Probability
+                </div>
+
+                <div class="metric-value">
+                    {{ probability }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="ai-result-actions">
+
+            <button
+                type="button"
+                class="ai-result-button"
+                id="askAiResultButton"
+                onclick="openResultAssistant()"
+            >
+                <span>🤖</span> Ask AI About This Result
+            </button>
+
+        </div>
+
+
+        {% if xai_explanation and xai_explanation.available %}
+        <section class="xai-panel">
+            <h3>Explainable AI — Why did the model predict this?</h3>
+            <div class="xai-method">Method: {{ xai_explanation.method }}</div>
+            <div class="xai-summary">{{ xai_explanation.summary }}</div>
+            {% for item in xai_explanation.features %}
+            <div class="xai-row">
+                <span class="xai-feature">{{ item.feature }}</span>
+                <span class="{% if item.contribution > 0 %}xai-up{% elif item.contribution < 0 %}xai-down{% else %}xai-neutral{% endif %}">{{ item.direction }}</span>
+            </div>
+            {% endfor %}
+            <div class="xai-note">Feature contribution explains the behavior of this trained model for this input. It is not a clinical explanation or a medical diagnosis.</div>
+        </section>
+        {% endif %}
+
+        <div class="result-ai-panel" id="resultAiPanel" hidden>
+
+            <div class="result-ai-header">
+                <div>
+                    <strong>Heart AI Assistant</strong>
+                    <small>Explanation based on this assessment</small>
+                </div>
+                <button type="button" class="result-ai-close" onclick="closeResultAssistant()">×</button>
+            </div>
+
+            <div class="result-ai-quick">
+                <button type="button" onclick="askResultAI('Explain my result in simple words.')">Explain my result</button>
+                <button type="button" onclick="askResultAI('Why is my risk classified this way?')">Why this risk?</button>
+                <button type="button" onclick="askResultAI('What should I discuss with my doctor?')">Doctor discussion</button>
+            </div>
+
+            <div class="result-ai-messages" id="resultAiMessages">
+                <div class="result-ai-message assistant">
+                    I can explain this assessment in simple language. I cannot replace a qualified healthcare professional.
+                </div>
+            </div>
+
+            <div class="result-ai-input-row">
+                <input
+                    type="text"
+                    id="resultAiInput"
+                    placeholder="Ask about your result..."
+                    maxlength="500"
+                    onkeydown="if(event.key === 'Enter') askResultAI()"
+                >
+                <button type="button" onclick="askResultAI()">Send</button>
+            </div>
+
+        </div>
+
+
+        <form action="/report" method="POST">
+
+            <input
+                type="hidden"
+                name="risk_score"
+                value="{{ risk_score }}"
+            >
+
+            <input
+                type="hidden"
+                name="category"
+                value="{{ category }}"
+            >
+
+            <input
+                type="hidden"
+                name="probability"
+                value="{{ probability }}"
+            >
+
+            <input
+                type="hidden"
+                name="patient_name"
+                value="{{ patient_name or '' }}"
+            >
+
+            <input
+                type="hidden"
+                name="patient_id"
+                value="{{ patient_id or '' }}"
+            >
+
+            <button
+                type="submit"
+                class="report-button"
+            >
+                📄 Download Medical Report
+            </button>
+
+        </form>
+
+    {% endif %}
+
+
+    <a
+        href="{{ url_for('prediction') }}"
+        class="back-button"
+    >
+        ← Back to Prediction
+    </a>
+
+
+    <div class="disclaimer">
+
+        AI-assisted risk estimation only.
+        This result is not a definitive medical diagnosis.
+        Consult a qualified healthcare professional for clinical evaluation.
+
+    </div>
 
 </div>
+
+
+<script>
+    const resultAssistantContext = {
+        prediction_id: {{ prediction_id|tojson }},
+        patient_id: {{ patient_id|tojson }},
+        risk_score: {{ risk_score|tojson }},
+        category: {{ category|tojson }},
+        probability: {{ probability|tojson }},
+        detection_status: {{ detection_status|tojson }},
+        patient_name: {{ patient_name|default('', true)|tojson }}
+    };
+
+    function openResultAssistant() {
+        const panel = document.getElementById('resultAiPanel');
+        panel.hidden = false;
+        document.getElementById('resultAiInput').focus();
+    }
+
+    function closeResultAssistant() {
+        document.getElementById('resultAiPanel').hidden = true;
+    }
+
+    function appendResultAIMessage(text, type) {
+        const box = document.getElementById('resultAiMessages');
+        const item = document.createElement('div');
+        item.className = 'result-ai-message ' + type;
+        item.textContent = text;
+        box.appendChild(item);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    async function askResultAI(prefilledMessage) {
+        openResultAssistant();
+        const input = document.getElementById('resultAiInput');
+        const message = (prefilledMessage || input.value || '').trim();
+        if (!message) return;
+
+        input.value = '';
+        appendResultAIMessage(message, 'user');
+        appendResultAIMessage('Thinking...', 'assistant');
+        const messages = document.getElementById('resultAiMessages');
+        const thinking = messages.lastElementChild;
+
+        try {
+            const response = await fetch('/api/assistant', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: message,
+                    prediction_id: resultAssistantContext.prediction_id,
+                    patient_id: resultAssistantContext.patient_id
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'Assistant request failed.');
+            }
+
+            thinking.textContent = data.answer || 'I could not generate an explanation right now.';
+        } catch (error) {
+            thinking.textContent = 'The AI assistant is temporarily unavailable. Please try again.';
+            console.error('Result assistant error:', error);
+        }
+    }
+</script>
 
 </body>
 </html>
