@@ -649,37 +649,79 @@ XAI_FEATURE_NAMES = [
     "Exercise Angina", "Oldpeak", "Slope", "Major Vessels", "Thal"
 ]
 
+# Reuse the SHAP explainer between requests. Creating a new KernelExplainer
+# for every prediction adds unnecessary overhead on small/free web instances.
+_XAI_EXPLAINER = None
+_XAI_BACKGROUND = np.zeros((1, len(XAI_FEATURE_NAMES)), dtype=np.float32)
+
+
+def _xai_predict_fn(batch):
+    """Run model inference directly in batches, avoiding model.predict overhead."""
+    batch = np.asarray(batch, dtype=np.float32)
+    return np.asarray(model(batch, training=False)).reshape(-1)
+
+
 def build_xai_explanation(scaled_input):
-    values = np.asarray(scaled_input, dtype=float).reshape(1, -1)
+    global _XAI_EXPLAINER
+
+
+    values = np.asarray(scaled_input, dtype=np.float32).reshape(1, -1)
     contributions = []
     method = "Local feature sensitivity"
 
-    if shap is not None:
+    # Kernel SHAP is retained, but reduced to the minimum practical sample
+    # count for 13 features (2 * 13 + 1). The default SHAP sample count is
+    # much larger and can cause Render/Gunicorn worker timeouts.
+    if shap is not None and model is not None:
         try:
-            background = np.zeros((1, values.shape[1]), dtype=float)
-            def predict_fn(x):
-                return np.asarray(model.predict(x, verbose=0)).reshape(-1)
-            explainer = shap.KernelExplainer(predict_fn, background)
-            shap_values = explainer.shap_values(values, nsamples=100)
+            if _XAI_EXPLAINER is None:
+                _XAI_EXPLAINER = shap.KernelExplainer(
+                    _xai_predict_fn,
+                    _XAI_BACKGROUND
+                )
+
+            shap_values = _XAI_EXPLAINER.shap_values(
+                values,
+                nsamples=(2 * values.shape[1] + 1),
+                l1_reg=0
+            )
             if isinstance(shap_values, list):
                 shap_values = shap_values[0]
-            shap_values = np.asarray(shap_values).reshape(-1)
-            method = "SHAP (KernelExplainer)"
-            for name, val, contribution in zip(XAI_FEATURE_NAMES, values[0], shap_values):
-                contributions.append({"feature": name, "input_value": float(val), "contribution": float(contribution)})
+            shap_values = np.asarray(shap_values, dtype=float).reshape(-1)
+
+            if shap_values.size == values.shape[1]:
+                method = "SHAP (KernelExplainer, optimized)"
+                for name, val, contribution in zip(
+                    XAI_FEATURE_NAMES, values[0], shap_values
+                ):
+                    contributions.append({
+                        "feature": name,
+                        "input_value": float(val),
+                        "contribution": float(contribution)
+                    })
         except Exception as exc:
             print("SHAP explanation unavailable, using local sensitivity:", exc)
+            _XAI_EXPLAINER = None
 
+    # Fast batched fallback: preserve the explanation output when SHAP is
+    # unavailable, while requiring only one batched model call.
     if not contributions:
         try:
-            base = float(model.predict(values, verbose=0)[0][0])
-            for i, name in enumerate(XAI_FEATURE_NAMES):
-                perturbed = values.copy()
-                delta = max(abs(float(values[0, i])) * 0.05, 0.05)
-                perturbed[0, i] += delta
-                changed = float(model.predict(perturbed, verbose=0)[0][0])
-                contributions.append({"feature": name, "input_value": float(values[0, i]), "contribution": changed - base})
-        except Exception:
+            base = float(_xai_predict_fn(values)[0])
+            perturbed = np.repeat(values, values.shape[1], axis=0)
+            deltas = np.maximum(np.abs(values[0]) * 0.05, 0.05)
+            perturbed[np.arange(values.shape[1]), np.arange(values.shape[1])] += deltas
+            changed = _xai_predict_fn(perturbed)
+            contributions = [
+                {
+                    "feature": name,
+                    "input_value": float(values[0, i]),
+                    "contribution": float(changed[i] - base)
+                }
+                for i, name in enumerate(XAI_FEATURE_NAMES)
+            ]
+        except Exception as exc:
+            print("Local sensitivity explanation unavailable:", exc)
             contributions = []
 
     contributions.sort(key=lambda x: abs(x["contribution"]), reverse=True)
@@ -695,7 +737,10 @@ def build_xai_explanation(scaled_input):
         "available": bool(top),
         "method": method,
         "features": top,
-        "summary": ("The explanation shows which input features had the strongest local influence on this model prediction. Positive contribution moved the model output upward; negative contribution moved it downward." if top else "Feature-level explanation is currently unavailable."),
+        "summary": (
+            "The explanation shows which input features had the strongest local influence on this model prediction. Positive contribution moved the model output upward; negative contribution moved it downward."
+            if top else "Feature-level explanation is currently unavailable."
+        ),
     }
 
 @app.route("/")
