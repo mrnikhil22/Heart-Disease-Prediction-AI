@@ -1,6 +1,7 @@
 # Python
 .venv/
 venv/
+tfenv/
 __pycache__/
 *.pyc
 
@@ -8,6 +9,8 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
+# Runtime data (databases and uploads are created at runtime)
 medical_uploads/
+doctor_documents/
 heart_ai.db
 *.db

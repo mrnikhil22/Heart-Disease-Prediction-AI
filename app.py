@@ -11,9 +11,16 @@ from tensorflow.keras.models import load_model
 import numpy as np
 import io
 import os
+import shutil
 import pytesseract
 
-TESSERACT_PATH = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+# Locate Tesseract portably: TESSERACT_CMD env var -> PATH -> common Windows
+# install locations. OCR features degrade gracefully if it is not installed.
+TESSERACT_PATH = (
+    os.environ.get("TESSERACT_CMD")
+    or shutil.which("tesseract")
+    or r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+)
 
 pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
 import sqlite3
